@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 修改采购订单行视图，添加动态只读 -->
+    <record id="purchase_order_line_form_view_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.line.form.inherit</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_form"/>
+        <field name="arch" type="xml">
+            <!-- 销售创建的RFQ，行项目价格对采购只读 -->
+            <field name="price_unit" position="attributes">
+                <attribute name="readonly">
+                    parent.creator_type == 'sale' and parent.state in ('draft', 'sent')
+                </attribute>
+            </field>
+            <field name="product_qty" position="attributes">
+                <attribute name="readonly">
+                    parent.creator_type == 'sale' and parent.state in ('draft', 'sent')
+                </attribute>
+            </field>
+            <field name="discount" position="attributes">
+                <attribute name="readonly">
+                    parent.creator_type == 'sale' and parent.state in ('draft', 'sent')
+                </attribute>
+            </field>
+        </field>
+    </record>
+
+    <!-- 修改采购订单列表视图 -->
+    <record id="purchase_order_list_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.list.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="creator_type" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- 修改采购订单表单视图 - 添加提示信息 -->
+    <record id="purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('alert-warning')]" position="before">
+                <div class="alert alert-info" role="alert" invisible="creator_type != 'sale' or state not in ('draft', 'sent')">
+                    <i class="fa fa-info-circle"/>
+                    此询价单由销售创建，采购用户无法修改价格。如需修改请联系销售。
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

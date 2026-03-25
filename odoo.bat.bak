@@ -1,0 +1,5 @@
+@echo on
+cd /d C:\apps\odoo
+start /b conda run -n py311 python odoo-bin --addons-path="./addons" --http-port=8070 --db_host=127.0.0.1 --db_port=5432 --db_user=odoo --db_password=odoo --database=app
+ngrok.exe config add-authtoken 3BKkC5ny4vAN7LkvpvY2vUgyF8w_4QZ1qX8QoUsa1LSd5yygZ
+ngrok.exe http 192.168.1.50:8070

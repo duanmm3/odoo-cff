@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 历史报价导入向导 -->
+    <record id="view_import_quote_history_wizard" model="ir.ui.view">
+        <field name="name">import.quote.history.wizard.form</field>
+        <field name="model">import.quote.history.wizard</field>
+        <field name="arch" type="xml">
+            <form string="导入报价历史">
+                <group>
+                    <group>
+                        <field name="import_file" widget="binary" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                        <field name="import_mode"/>
+                    </group>
+                    <group>
+                        <div>
+                            <p>CSV文件格式要求:</p>
+                            <code>vendor_name,product_name,price,quote_count</code>
+                            <p class="text-muted">示例:</p>
+                            <code>Acme Corp,Product A,100.00,5</code>
+                        </div>
+                    </group>
+                </group>
+                
+                <group>
+                    <button name="action_import_file" string="预览数据" type="object" 
+                            class="btn-primary"/>
+                </group>
+                
+                <group>
+                    <field name="preview_ids">
+                        <list string="Preview" create="false" delete="false" editable="bottom">
+                            <field name="vendor_name"/>
+                            <field name="product_name"/>
+                            <field name="price"/>
+                            <field name="quote_count"/>
+                            <field name="import_status" widget="badge"
+                                   decoration-success="import_status == 'ready'"
+                                   decoration-danger="import_status == 'error'"/>
+                        </list>
+                    </field>
+                </group>
+                
+                <footer>
+                    <button name="action_confirm_import" string="确认导入" type="object" 
+                            class="btn-primary"/>
+                    <button string="取消" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- 手动添加报价历史向导 -->
+    <record id="view_manual_quote_history_wizard" model="ir.ui.view">
+        <field name="name">manual.quote.history.wizard.form</field>
+        <field name="model">manual.quote.history.wizard</field>
+        <field name="arch" type="xml">
+            <form string="添加报价历史">
+                <group>
+                    <field name="vendor_id" options="{'no_create': True}"/>
+                    <field name="product_id" options="{'no_create': True}"/>
+                    <field name="price"/>
+                    <field name="quote_date"/>
+                </group>
+                <footer>
+                    <button name="action_add" string="添加" type="object" class="btn-primary"/>
+                    <button string="取消" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- 菜单动作 -->
+    <record id="action_import_quote_history" model="ir.actions.act_window">
+        <field name="name">导入报价历史</field>
+        <field name="res_model">import.quote.history.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_manual_quote_history" model="ir.actions.act_window">
+        <field name="name">手动添加报价历史</field>
+        <field name="res_model">manual.quote.history.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- 供应商报价历史菜单 -->
+    <menuitem id="menu_vendor_quote_history"
+              name="供应商报价历史"
+              parent="purchase.menu_purchase_config"
+              action="custom_smart_rfq_notify.action_view_vendor_quote_history"
+              sequence="100"
+              groups="purchase.group_purchase_user"/>
+
+    <record id="action_view_vendor_quote_history" model="ir.actions.act_window">
+        <field name="name">供应商报价历史</field>
+        <field name="res_model">purchase.vendor.quote.history</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!-- 导入菜单 -->
+    <menuitem id="menu_import_quote_history"
+              name="导入报价历史"
+              parent="purchase.menu_purchase_config"
+              action="action"
+              sequence="101"
+              groups_import_quote_history="purchase.group_purchase_manager"/>
+
+    <menuitem id="menu_manual_quote_history"
+              name="手动添加"
+              parent="purchase.menu_purchase_config"
+              action="action_manual_quote_history"
+              sequence="102"
+              groups="purchase.group_purchase_user"/>
+</odoo>

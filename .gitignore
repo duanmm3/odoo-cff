@@ -1,0 +1,52 @@
+# sphinx build directories
+_build/
+
+# dotfiles
+.*
+!.gitignore
+!.gitkeep
+!.github
+!.mailmap
+!.weblate.json
+
+# compiled python files
+*.py[co]
+__pycache__/
+
+# setup.py egg_info
+*.egg-info
+
+# emacs backup files
+*~
+
+# hg stuff
+*.orig
+status
+
+# odoo filestore
+odoo/filestore
+
+# maintenance migration scripts
+odoo/addons/base/maintenance
+
+# windows installation config file
+/odoo.conf
+
+# generated for windows installer?
+install/win32/*.bat
+install/win32/meta.py
+
+# Custom files to ignore
+*.zip
+*.sql
+*.log
+*.bat
+*.md
+*.txt
+*.csv
+*.xlsx
+*.json
+data/
+doc/
+debian/
+setup/

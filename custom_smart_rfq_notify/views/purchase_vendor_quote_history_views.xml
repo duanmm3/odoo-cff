@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 供应商报价历史列表视图 -->
+    <record id="view_vendor_quote_history_list" model="ir.ui.view">
+        <field name="name">purchase.vendor.quote.history.list</field>
+        <field name="model">purchase.vendor.quote.history</field>
+        <field name="arch" type="xml">
+            <list string="Vendor Quote History" decoration-success="quote_count > 5">
+                <field name="vendor_id"/>
+                <field name="product_id"/>
+                <field name="quote_count"/>
+                <field name="last_quote_date"/>
+                <field name="last_quote_price" widget="monetary"/>
+                <field name="avg_price" widget="monetary"/>
+                <field name="min_price" widget="monetary"/>
+                <field name="quote_score" widget="float"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 供应商报价历史表单视图 -->
+    <record id="view_vendor_quote_history_form" model="ir.ui.view">
+        <field name="name">purchase.vendor.quote.history.form</field>
+        <field name="model">purchase.vendor.quote.history</field>
+        <field name="arch" type="xml">
+            <form string="Vendor Quote History">
+                <group>
+                    <field name="vendor_id"/>
+                    <field name="product_id"/>
+                </group>
+                <group>
+                    <field name="quote_count"/>
+                    <field name="last_quote_date"/>
+                    <field name="last_quote_price"/>
+                    <field name="avg_price"/>
+                    <field name="min_price"/>
+                    <field name="max_price"/>
+                </group>
+                <group>
+                    <field name="quote_score"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- 供应商报价历史搜索视图 -->
+    <record id="view_vendor_quote_history_search" model="ir.ui.view">
+        <field name="name">purchase.vendor.quote.history.search</field>
+        <field name="model">purchase.vendor.quote.history</field>
+        <field name="arch" type="xml">
+            <search string="Search Vendor Quote History">
+                <field name="vendor_id"/>
+                <field name="product_id"/>
+                <filter string="Active Vendors" name="active" 
+                    domain="[('quote_count', '>', 0)]"/>
+                <group expand="0" string="Group By">
+                    <group string="Vendor">
+                        <field name="vendor_id" filter="1"/>
+                    </group>
+                    <group string="Product">
+                        <field name="product_id" filter="1"/>
+                    </group>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- 报价记录列表视图 -->
+    <record id="view_purchase_order_quote_list" model="ir.ui.view">
+        <field name="name">purchase.order.quote.list</field>
+        <field name="model">purchase.order.quote</field>
+        <field name="arch" type="xml">
+            <list string="Quotes">
+                <field name="vendor_id"/>
+                <field name="price_subtotal" widget="monetary"/>
+                <field name="price_tax" widget="monetary"/>
+                <field name="price_total" widget="monetary"/>
+                <field name="quoted_at"/>
+                <field name="note"/>
+            </list>
+        </field>
+    </record>
+</odoo>

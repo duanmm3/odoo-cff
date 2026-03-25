@@ -1,0 +1,822 @@
+﻿
+
+需用使用xmlrpc做联系人信息导入:
+odoo 19服务器IP：127.0.0.1 ，端口8070 , contact_ext 模块 ， 数据库 apps
+ODOO管理员: admin password:  admin
+服务链接：http://127.0.0.1:8070/odoo/contacts
+请录入以下供应商数据，这些都是供应商信息，后面 “共享销售1	共享销售2” 是指 “共享销售/采购” ； 客户/供应商标记： 客户
+要求和历史联系人要去重：联系人+客户类型+销售;检测到“联系人+客户类型+销售”和历史数据重复，则不用写入数据。
+
+联系人	客户类型	共享销售1	共享销售2
+西摩电讯有限公司	CT	Alan	
+天津凯发电气股份有限公司	CF	Alan	
+视旗科技(深圳)有限公司	CT	Alan	
+深圳市鹰飞电子有限公司	CT	Alan	
+深圳市芯凯迪科技有限公司	CT	Alan	
+深圳市万兆通光电技术有限公司	CF	Alan	
+深圳市鹏创达电子有限公司	CT	Alan	
+深圳市联创杰科技有限公司	CT	Alan	
+深圳市今东芯电子科技有限公司	CT	Alan	
+深圳市华时信科技有限公司	CT	Alan	
+深圳市航盛科技有限公司	CT	Alan	
+深圳市丰治电子制造有限公司	CF	Alan	
+深圳鹏芯半导体科技（集团）有限公司	CT	Alan	
+深圳丽泽智能科技有限公司	CT	Alan	
+上海尔浩电子科技有限公司	CT	Alan	
+山东智锐环卫设备有限公司	CT	Alan	
+广东智安芯科技有限公司	CF	Alan	
+Bechmark	OF	Amanda	
+樽臻电子科技（上海）有限公司	CT	Alan	
+浙江恩沃新能源科技有限公司	CT	Alan	
+天津摩沃科技有限公司	CT	Alan	
+天津博顿电子有限公司	CF	Alan	
+深圳未来立体科技有限公司	CT	Alan	
+深圳市芯闪科技有限公司	CT	Alan	
+杭州眼云智家科技有限公司	CT	Alan	
+杭州博创微电子有限公司	CT	Alan	
+广州视源电子科技股份有限公司	CT	Alan	
+广州视琨电子科技有限公司	CF	Alan	
+广州驰景企智能电子技术有限公司	CT	Alan	
+北京晟远创电子技术有限公司	CT	Alan	
+深圳市亨捷瑞电子科技有限公司	CT	Alan	
+深圳市易达凯电子有限公司..	CT	Cathy	
+Vyrian Inc	CT	Cathy	
+Vital Electronics	OT	Cathy	
+Tektot Labs LLC (NM)	OT	Cathy	
+Smith ﹠ Associates LP	OT	Cathy	lillian
+Rebound Electronics (Hong Kong) Ltd	OT	Cathy	
+Precogs	OT	Cathy	
+Katsuki Co., Ltd.	OT	Cathy	
+IC Lando Inc.	OT	Cathy	
+Fantastic Sourcing	OT	Cathy	
+Classic Components	OT	Cathy	
+Bright Electronics Co., Ltd	OT	Cathy	
+A2 GLOBAL ELECTRONICS + SOLUTIONS	OT	Cathy	
+OMEGA GTI ASIA INC	OT	lillian	
+正能量物流香港有限公司	CT	Coco	
+蕴科有限公司	CT	Coco	
+易達通實業(香港)有限公司	CT	Coco	
+迅龙供应链(香港)有限公司	CT	Coco	
+新达科技有限公司	CT	Coco	
+希玛科技有限公司	CT	Coco	
+深圳市众唯电子有限公司	CT	Coco	
+深圳市全旭华电子科技有限公司	CT	Coco	
+深圳市美意佳电子有限公司.	CT	Coco	
+深圳市捷扬讯科电子有限公司	CT	Coco	
+深圳市飞鸣微科技有限公司	CT	Coco	
+深圳市比洋光通信科技股份有限公司	CF	Coco	
+领质电子科技（上海）有限公司	CT	Coco	
+康比旺电子科技有限公司	CT	Coco	
+華科供應鏈(香港) 有限公司	CT	Coco	
+华泰进出口（香港）有限公司	CT	Coco	
+东莞市元石科技有限公司	CT	Coco	
+超微供应链	CT	Coco	
+Velocity Electronics	OT	Coco	
+Vantage IC, LLC	OT	Coco	
+SUN DA INDUSTRIAL GLOBAL LTD	CT	Coco	
+SFO Technologies Pvt Ltd	OF	Coco	
+SAILINGSPEEDY ELECTRONICS	OT	Coco	
+Rand Technology LLC	OT	Coco	
+Mogultech International Ltd	CT	Coco	
+KAGA (H.K.) ELECTRONICS LTD	OT	Coco	
+HUA PU ELECTRONICS HONGKONG LIMITED	CT	Coco	
+Hong Kong Cat Technology Co.， Limited	CT	Coco	
+EASTRILL INTERNATIONAL CO.,LTD	CT	Coco	
+dormakaba EAD	CF	Coco	
+Astute Electronics Inc.	OT	Coco	Cathy
+深圳市芯和众创科技有限公司	CT	Crystal	
+Sourceability SG Pte Ltd Singpore	OT	Emma	Lillian
+钻石山制造有限公司	CT	Ferpa	
+中扬电子（深圳）有限公司	CT	Ferpa	
+云汉芯城（上海）电子科技有限公司	CT	Ferpa	
+友利电子信息科技有限公司	CT	Ferpa	
+西区国际（香港）有限公司	CT	Ferpa	
+武汉芯中心科技有限公司	CT	Ferpa	
+舒诺香港科技有限公司	CT	Ferpa	
+圣邦科技	CT	Ferpa	
+深圳易凯达科技有限公司	CT	Ferpa	
+深圳市洲尚科技有限公司	CT	Ferpa	
+深圳市智勤芯科技有限公司	CT	Ferpa	
+深圳市知芯科技有限公司	CT	Ferpa	
+深圳市宇元齐芯科技有限公司	CT	Ferpa	
+深圳市优特美尔电子有限公司	CT	Ferpa	
+深圳市英特翎科技有限公司	CT	Ferpa	
+深圳市英恒健科技有限公司	CT	Ferpa	
+深圳市懿创科技有限公司	CT	Ferpa	
+深圳市易尚德科技有限公司	CT	Ferpa	
+深圳市易达凯电子有限公司	CT	Ferpa	
+深圳市亿鑫微电子有限公司	CT	Ferpa	
+深圳市亿明兴电子科技有限公司	CT	Ferpa	
+深圳市雅莱斯科技有限公司	CT	Ferpa	
+深圳市星航源科技有限公司1	CT	Ferpa	
+深圳市鑫嘉电子有限公司	CT	Ferpa	
+深圳市新睿源电子科技有限公司	CT	Ferpa	
+深圳市芯科晟电子科技有限公司	CT	Ferpa	
+深圳市芯科华高科技有限公司	CT	Ferpa	
+深圳市芯创恒微电子有限公司	CT	Ferpa	
+深圳市携丰达科技有限公司	CT	Ferpa	
+深圳市唯特资讯有限公司	CT	Ferpa	
+深圳市万联芯科技有限公司	CT	Ferpa	
+深圳市三优兴电子有限公司	CT	Ferpa	
+深圳市三合成科技有限公司	CT	Ferpa	
+深圳市擎联科技有限公司	CT	Ferpa	
+深圳市飘美科技有限公司	CT	Ferpa	
+深圳市猎芯科技有限公司	CT	Ferpa	
+深圳市良芯微技术有限公司	CT	Ferpa	
+深圳市雷诺微电子有限公司	CT	Ferpa	
+深圳市凯创资通电子有限公司	CT	Ferpa	
+深圳市颉隆科技有限公司	CT	Ferpa	
+深圳市捷宇丰科技有限公司	CT	Ferpa	
+深圳市捷扬讯科电子有限公司	CT	Ferpa	
+深圳市嘉祜科技有限公司	CT	Ferpa	
+深圳市嘉博创科技有限公司	CT	Ferpa	
+深圳市华美智芯科技有限公司	CT	Ferpa	
+深圳市宏博通科技有限公司	CT	Ferpa	
+深圳市恒芯伟创电子科技有限公司	CT	Ferpa	
+深圳市恒创达实业有限公司	CT	Ferpa	
+深圳市黑电平科技有限公司	CT	Ferpa	
+深圳市颢天成科技有限公司	CT	Ferpa	
+深圳市光伟业科技有限公司	CT	Ferpa	
+深圳市孚森电子有限公司	CT	Ferpa	
+深圳市恩智科技有限公司	CT	Ferpa	
+深圳市鼎铨科技有限公司	CT	Ferpa	
+深圳市得捷芯城科技有限公司	CT	Ferpa	
+深圳市诚祥智慧科技有限公司	CT	Ferpa	
+深圳市常富电子有限公司	CT	Ferpa	
+深圳市博科大科技有限公司	CT	Ferpa	
+深圳市百能信息技术有限公司	CT	Ferpa	
+深圳市八小时电子元件有限公司	CT	Ferpa	
+深圳市艾泽电子有限公司	CT	Ferpa	
+深圳华强电子网集团股份有限公司1	CT	Ferpa	
+睿昇电子科技（香港）有限公司	CT	Ferpa	
+荣德国际有限公司	CT	Ferpa	
+乔翎电子技术有限公司	CT	Ferpa	
+普睿电子(香港)有限公司	CT	Ferpa	
+南京蓝小星智能制造科技有限公司	CF	Ferpa	
+立腾电子科技（珠海）有限公司	CT	Ferpa	
+蓝芯信息科技深圳有限公司	CT	Ferpa	
+金创科技香港有限公司	CT	Ferpa	
+江西运科电子有限公司	CT	Ferpa	
+广州树阳电子科技有限公司	CT	Ferpa	
+富东通信（深圳）集团有限公司	CT	Ferpa	
+东莞益尔益实业有限公司	CT	Ferpa	
+东莞市鑫禾悦音响科技有限公司	CT	Ferpa	
+鼎芯国际贸易（深圳）有限公司1	CT	Ferpa	
+北京星泰恒利电子科技有限公司	CT	Ferpa	
+安芯易电子商务(深圳)有限公司	CT	Ferpa	
+Quiksol Int’l Components Pte Ltd Singapore	CT	Ferpa	
+LUXTRONICS CO., LIMITED	CT	Ferpa	
+GREAT DEVELOPMENT INTERNATIONAL LIMITED	CT	Ferpa	
+CONVERGE ASIA PTE LTD	OT	Ferpa	
+ALTRUISM ELECTRONICS CO., LIMITED	CT	Ferpa	
+郑州跃博汽车电器有限公司	CF	Alan	
+十堰车仪电子科技有限公司	CT	Alan	
+迈隆（西安）电子技术有限公司	CT	Alan	
+济宁华瑞自动化技术有限公司	CT	Alan	
+杭州灵翔电子发展有限公司	CT	Alan	
+东莞顺盛电器有限公司	CF	Alan	
+东莞市盟科自动化科技有限公司	CF	Alan	
+东莞比高模型制品有限公司	CF	Alan	
+中国石油天然气集团有限公司	CT	huabing	
+正文芯（上海）电子科技有限公司。	CT	huabing	
+禹捷科技（深圳）有限公司	CT	huabing	
+英特翎电子（香港）有限公司	CT	huabing	
+新光维医疗科技（苏州）股份有限公司	CF	huabing	
+芯华章科技股份有限公司	CF	huabing	
+芯百特微电子（无锡）有限公司	CT	huabing	
+香港恒順永利科技有限公司	CT	huabing	
+深圳市亿泰科技有限公司	CT	huabing	
+深圳市亿路发科技有限公司。	CT	huabing	
+深圳市讯龙电子有限公司	CT	huabing	
+深圳市兴万光电有限公司	CT	huabing	
+深圳市锌源丰电子集团有限公司	CT	huabing	
+深圳市芯皓电子有限公司.	CT	huabing	
+深圳市晓芯电子有限公司	CT	huabing	
+深圳市维合丰实业有限公司	CT	huabing	
+深圳市似锦电子有限公司	CT	huabing	
+深圳市神州中科科技有限公司	CT	huabing	
+深圳市尚风电子有限公司	CT	huabing	
+深圳市荣橙科技有限公司	CT	huabing	
+深圳市启华芯电子科技有限公司	CT	huabing	
+深圳市雷赛控制技术有限公司	CF	huabing	
+深圳市科源芯创电子有限公司	CT	huabing	
+深圳市杰特明电子科技有限公司	CT	huabing	
+深圳市坚辉电子有限公司。	CT	huabing	
+深圳市嘉天华电子科技有限公司	CT	huabing	
+深圳市恒广业科技有限公司	CT	huabing	
+深圳市安之恒科技有限公司	CT	huabing	
+深圳南信国际电子有限公司	CT	huabing	
+深圳华秋电子有限公司	CT	huabing	
+深圳华强电子网集团股份有限公司事业一部	CT	huabing	
+宁波市翰玛电子科技有限公司	CT	huabing	
+鲲芯科技（深圳）有限公司	CT	huabing	
+恒邦电子有限公司	CT	huabing	
+赣州得辉达科技有限公司	CT	huabing	
+得朋电子有限公司	CT	huabing	
+IC SUPERMAN COMPANY LIMITED	CT	huabing	
+深圳市深茂电子有限公司	CT	ferpa	ferpa
+深圳市凯邦伟业科技有限公司	CT	ferpa	ferpa
+深圳前海冰寒信息科技有限公司	CT	ferpa	ferpa
+广州粤控电气技术有限公司	CF	ferpa	ferpa
+广州瑞立科密汽车电子股份有限公司	CF	ferpa	ferpa
+格瑞希尔电子（深圳）有限公司	CT	ferpa	ferpa
+福州市君澜达科技有限公司	CT	ferpa	ferpa
+德州鲲程电子科技有限公司	CT	ferpa	ferpa
+创芯时代（深圳）科技有限公司	CT	ferpa	ferpa
+创世讯联科技（深圳）有限公司	CT	ferpa	ferpa
+深圳市鸿亿达电子科技有限公司	CT	ferpa	ferpa
+INNOVATION TECHNOLOGY CO., LTD.	OT	Lillian	
+Eptix Electronics Inc	CT	Lillian	
+深圳市心可通讯科技有限公司	CT	Huabing	
+深圳市京科微电子科技有限公司	CT	Huabing	
+明漢科技有限公司	CT	Huabing	
+广州新一代研究院	CF	Huabing	
+Warming Technology Co.,Ltd	CT	lillian	
+Gronet Co.,Ltd	OT	lillian	
+Almedio	OT	lillian	
+Alcove Electronic Services	OT	lillian	
+cidev group philippines Branch	OT	lillian	
+珠海英搏尔电气有限公司	CF	Milne	
+珠海市深瑞智联科技有限公司	CF	Milne	
+致尚芯诚电子科技有限公司	CT	Milne	
+郑州日产汽车有限公司	CF	Milne	
+浙江国冶星智造技术有限公司	CF	Milne	
+张店区益田电子经营部	CT	Milne	
+永利电子元器件（深圳）有限公司	CT	Milne	
+英华达（南京）科技有限公司	CT	Milne	
+新美亚电子(深圳)有限公司	OF	Milne	
+希玛科技集团	CT	Milne	
+武汉光至科技有限公司	CF	Milne	
+天津博顿电子有限公司	CF	Milne	
+苏州天禹电子科技有限公司	CT	Milne	
+苏州酷科电子有限公司	CT	Milne	
+深圳易能电气技术股份有限公司	CF	Milne	
+深圳市泽创电子有限公司	CT	Milne	
+深圳市友利电子信息科技有限公司	CT	Milne	ferpa
+深圳市英威腾电气股份有限公司	CF	Milne	
+深圳市英威腾电动汽车驱动技术有限公司	CF	Milne	
+深圳市英威腾电动汽车充电技术有限公司	CF	Milne	
+深圳市英唐智能控制股份有限公司	CT	Milne	
+深圳市绎立锐光科技开发有限公司	CT	Milne	
+深圳市芯科华高科技有限公司	CT	Milne	
+深圳市锐钜科技有限公司	CT	Milne	
+深圳市全特科技有限公司	CT	Milne	
+深圳市龙阳电子有限公司	CT	Milne	
+深圳市理邦精密仪器股份有限公司	CF	Milne	
+深圳市凯新达电子有限公司	CT	Milne	
+深圳市今鸿星辉电子科技有限公司	CT	Milne	
+深圳市捷视飞通科技股份有限公司	CT	Milne	
+深圳市恒义达电子科技有限公司	CT	Milne	
+深圳市恩智科技有限公司	CT	Milne	
+深圳市鼎元智能科技有限公司	CT	Milne	
+深圳市德会鑫科技有限公司	CT	Milne	
+深圳市创尔优科技有限公司	CT	Milne	
+深圳市超联贸易有限公司	CT	Milne	
+深圳市奥拓电子股份有限公司	CT	Milne	
+深圳科菲光技术有限公司	CT	Milne	
+深圳华强电子集团股份有限公司	CT	Milne	
+上海镁顿电子科技有限公司	CT	Milne	
+木星（深圳）实业有限公司	CT	Milne	
+铭冠国际香港有限公司	CT	Milne	
+嘉联电子零件有限公司	CT	Milne	
+吉利四川商用车有限公司	CT	Milne	
+惠州市奥拓电子科技有限公司	CF	Milne	
+宏拓国际有限公司	CT	Milne	
+富瑞德电子（深圳）有限公司	CT	Milne	
+佛山市联动科技股份有限公司	CF	Milne	
+梵芯电子（深圳）集团有限公司	CT	Milne	
+东莞新南利电业有限公司	CT	Milne	
+成都航天凯特机电科技有限公司	CT	Milne	
+常州鼎顺电子有限公司	CT	Milne	
+伯仲电子有限公司	CT	Milne	
+北京广源国利电子有限公司	CT	Milne	
+奥茵绅智能装备（苏州市）有限公司	CF	Milne	
+安徽普能特电气有限公司	CF	Milne	
+埃泰克汽车电子(芜湖)有限公司	CF	Milne	
+We-Choster international electronics Co., Limited	CT	Milne	
+Viavi Solutions	OF	Milne	
+Imperial Distribution (ASIA) Limited	CT	Milne	
+HEISENER ELECTRONICS LIMITED	CT	Milne	
+ALPHALOGIC HongKong Limited	CF	Milne	
+XT Electronics Co.,Ltd 芯塔电子有限公司	CT	cathy	
+Future Distribution Services Gmbh	OT	yuan	
+EZKEY ELECTRONICS	CT	Alan	
+深圳市晚成辉电子有限公司	CT	Huabing	
+深圳市闪闪科技有限公司	CT	Huabing	
+深圳市捷力达电子科技发展有限公司	CT	Huabing	
+深圳市福沽威科技有限公司	CT	Huabing	
+航天信息股份有限公司涿州分公司	CT	Huabing	
+北京鼎耀科技有限公司	CT	Huabing	
+Fabrinet Co., Ltd	OF	lillian	
+深圳市佰润万达科技有限公司	CT	Suwen	
+NewPower Worldwide, LLC	OT	cathy	
+茵思普瑞控制系统 (上海) 有限公司	CF	Yuan	
+新航伟创（广州）科技有限公司	CT	Yuan	
+深圳市斯贝达电子有限公司	CT	Yuan	
+深圳市集睿电子有限公司	CT	Yuan	
+深圳市汇像信息技术有限公司	CF	Yuan	
+深圳市华钻电子有限公司	CT	Yuan	
+广州晶锐信息技术有限公司	CT	Yuan	
+Sigma Technology Inc	CT	Yuan	
+HK Xiangxingmao Technology Co., Limited	CT	Yuan	
+Future Electronics Inc (Dist) Pte Ltd	OT	Yuan	
+fusion worldwide team C	OT	Yuan	
+IBS TECHNOLOGY	OT	Yuan	
+
+
+需用使用xmlrpc做联系人信息导入:
+odoo 19服务器IP：127.0.0.1 ，端口8070 , contact_ext 模块 ， 数据库 app
+ODOO管理员: admin password:  admin
+服务链接：http://127.0.0.1:8070/odoo/contacts
+请录入以下供应商数据，这些都是供应商信息，后面 “共享采购1 共享采购2 共享采购3” 是指 “共享销售/采购” ； 客户/供应商标记： 供应商
+要求和历史联系人要去重：联系人+客户类型+销售;检测到“联系人+客户类型+销售”和历史数据重复，则不用写入数据。
+
+联系人	客户类型	共享采购1	共享采购2	共享采购3
+深圳市安华利科技有限公司	ST	Crystal　		
+EZKEY ELECTRONICS CO.,LIMITED深圳市易达凯电子有限公司	ST	Amanda　		
+Imperial Distribution (ASIA) Limited	ST	Amanda　		
+LEATECH ELECTRONICS LIMITED/立泰电子科技有限公司	ST	Amanda　		
+伯仲 R＆A	ST	Amanda　		
+致尚芯城电子科技有限公司	ST	Amanda　		
+北京志成伟业电子有限公司	ST	Crystal		
+禾田	ST	Crystal		
+商望电子有限公司	ST	Crystal		
+威健实业国际有限公司	SD	Coco　	Crystal	
+中国电子器材国际有限公司	SD	Coco　	Crystal	
+深圳匯众鼎泰科技有限公司	ST	Crystal		
+深圳世创兴科技有限公司	ST	Crystal		
+深圳市瀚赢实业科技有限公司	ST	Crystal		
+深圳市金洋伟业电子有限公司	ST	Crystal		
+深圳市静阳电子科技有限公司	ST	Crystal		
+深圳市六胜世纪电子有限公司	ST	Crystal		
+深圳市纳芯创展科技有限公司	ST	Crystal		
+深圳市伟诺源电子科技有限公司	ST	Crystal		
+深圳市无限芯城科技有限公司	ST	Crystal		
+深圳市信盛荣鑫科技有限公司	ST	Crystal		
+深圳市雄芯源科技有限公司	ST	Crystal		
+深圳市意法世纪电子有限公司	ST	Crystal		
+INDISE CO LTD	SD	Coco　		
+商希电子有限公司	SD	Coco　		
+macnica max	SD	Crystal　		
+NEW OSDD IC LIMITED	ST	Crystal　		
+Quiksol International HK PTE Limited	ST	Crystal　		
+Rochester Electronics LLC	SD	Crystal　		
+SMITH US	ST	Crystal　		
+SONA ELECTRONICS LIMITED/索纳电子有限公司	ST	Crystal　		
+Speed Components Ltd.	ST	Crystal　		
+Teraby co ltd	ST	Crystal　		
+Viavi solutions	SF	Crystal　		
+艾睿（中国）电子贸易有限公司	SD	Crystal　		
+安创股份（香港）有限公司	ST	Crystal　		
+邦華電子技術( 香港)有限公司	ST	Crystal　		
+北京创新在线电子产品销售有限公司	ST	Crystal　		
+北京桦阳电子科技发展有限公司	ST	Crystal　		
+北京杰赛华科技有限公司	ST	Crystal　		
+北京捷创华兴电子技术有限公司	ST	Crystal　		
+北京京穗港经贸中心	ST	Crystal　		
+北京凌科信诺科技有限公司	ST	Crystal　		
+北京润德康诺科技有限公司	ST	Crystal　		
+传诺科技有限公司	ST	Crystal　		
+慈溪市润微电子经营部	ST	Crystal　		
+廸盛（深圳）智能科技有限公司	ST	Crystal　		
+鼎豐實業控股有限公司	ST	Crystal　		
+飞驰半导体（深圳）有限公司	ST	Crystal　		
+富安国际信息技术（深圳）有限公司	ST	Crystal　		
+韩迪电子	SD	Crystal　		
+好芯科技（深圳）有限公司	ST	Crystal　		
+恒利（香港）電子有限公司	ST	Crystal　		
+宏拓国际有限公司	ST	Crystal　		
+鸿泰国际（中国）有限公司	ST	Crystal　		
+捷揚訊科國際有限公司	ST	Crystal　		
+聚芯优品（深圳）控股集团有限公司	ST	Crystal　		
+君盛豪（深圳）互联网半导体科技有限公司	ST	Crystal　		
+科盛（香港）电子有限公司	ST	Crystal　		
+科通科电子（深圳）有限公司	ST	Crystal　		
+昆山芯界电子贸易有限公司	ST	Crystal　		
+立创商城	SD	Crystal　		
+联诠国际贸易（上海）有限公司	ST	Crystal　		
+满芯科技（深圳）有限公司	ST	Crystal　		
+昴氏(上海)电子贸易有限公司	ST	Crystal　		
+宁波港德创新电子有限公司	ST	Crystal　		
+普美瑞电子科技（苏州）有限公司	ST	Crystal　	Sunny	
+瑞芯国际有限公司	ST	Crystal　		
+三阳科技（深圳）有限公司	ST	Crystal　		
+厦门君韦信息技术有限公司	ST	Crystal　		
+上海柏煜电子科技有限公司	ST	Crystal　		
+上海苏溯鑫贸易有限公司	ST	Crystal　		
+深圳创展世纪科技有限公司	ST	Crystal　		
+深圳格芯科技有限公司	ST	Crystal　		
+深圳浩锐微科电子技术有限公司	ST	Crystal　		
+深圳华宝泰电子有限公司	ST	Crystal　		
+深圳明嘉瑞科技有限公司	ST	Crystal　		
+深圳鸣威科技有限公司	ST	Crystal　		
+深圳润烁科技有限公司	ST	Crystal　		
+深圳尚能科技有限公司	ST	Crystal　		
+深圳市爱冠伟业电子有限公司	ST	Crystal　		
+深圳市安玛科技有限公司	ST	Crystal　		
+深圳市安尚达科技有限公司	ST	Crystal　		
+深圳市奥丽特电子经营部	ST	Crystal　		
+深圳市八万电子有限公司	ST	Crystal　		
+深圳市佰时科技有限公司	ST	Crystal　		
+深圳市宝星雅创科技有限公司	ST	Crystal　		
+深圳市滨兴微电子有限公司	ST	Crystal　		
+深圳市博兴电子有限公司	ST	Crystal　		
+深圳市成轩恒业电子科技有限公司	ST	Crystal　		
+深圳市创兴彩科技有限公司	ST	Crystal　		
+深圳市创雅恩科技有限公司	ST	Crystal　		
+深圳市达锐安电子有限公司	ST	Crystal　		
+深圳市大石科技有限公司	ST	Crystal　		
+深圳市鼎诺兴电子有限公司	ST	Crystal　		
+深圳市鼎旺电子有限公司	ST	Crystal　		
+深圳市东方天河科技有限公司	ST	Crystal　		
+深圳市东粤电子有限公司	ST	Crystal　		
+深圳市方原科技有限公司	ST	Crystal　		
+深圳市菲悦电子科技有限公司	ST	Crystal　		
+深圳市福田区百合电子	ST	Crystal　		
+深圳市福田区都会电子市场建信电子商行	ST	Crystal　		
+深圳市福田区希望电子经营部	ST	Crystal　		
+深圳市福田区新亚洲电子市场世恒电子商行	ST	Crystal　		
+深圳市富德芯科技有限公司	ST	Crystal　		
+深圳市港恒电子有限公司	ST	Crystal　		
+深圳市高胜电子有限公司	ST	Crystal　		
+深圳市谷科智电子有限公司	ST	Crystal　		
+深圳市硅源微电子科技有限公司	ST	Crystal　		
+深圳市国昂电子有限公司	ST	Crystal　		
+深圳市航瑞芯科技有限公司	ST	Crystal　		
+深圳市禾宝顺电子科技有限公司	ST	Crystal　		
+深圳市禾田普达科技有限公司	ST	Crystal　		
+深圳市合芯力科技有限公司	ST	Crystal　		
+深圳市恒创信科技有限公司	ST	Crystal　		
+深圳市恒广业科技有限公司	ST	Crystal　		
+深圳市恒芯绿能科技有限公司	ST	Crystal　		
+深圳市弘通科技有限公司	ST	Crystal　		
+深圳市泓勤科技有限公司	ST	Crystal　		
+深圳市洪生展业科技有限公司	ST	Crystal　		
+深圳市鸿盛世纪电子有限公司	ST	Crystal　		
+深圳市鸿图展业电子有限公司	ST	Crystal　		
+深圳市华力为电子有限公司（原华立威）	ST	Crystal　		
+深圳市华芯城科技有限公司	ST	Crystal　		
+深圳市华芯东科技有限公司	ST	Crystal　		
+深圳市华芯容电子科技有限公司	ST	Crystal　		
+深圳市华芯维电子科技有限公司	ST	Crystal　		
+深圳市环英电子有限公司	ST	Crystal　		
+深圳市汇集斯电子科技有限公司	ST	Crystal　		
+深圳市汇联微电子有限公司	ST	Crystal　		
+深圳市嘉营实业科技有限公司	ST	Crystal　		
+深圳市杰宝伟业科技有限公司	ST	Crystal　		
+深圳市金兆芯电子有限公司	ST	Crystal　		
+深圳市景翔科技有限公司	ST	Crystal　		
+深圳市均源微电子科技有限公司	ST	Crystal　		
+深圳市凯拉迪科技有限公司	ST	Crystal　		
+深圳市科辉特电子有限公司	ST	Crystal　		
+深圳市科鑫来电子有限公司	ST	Crystal　		
+深圳市科讯达微科技有限公司	ST	Crystal　		
+深圳市莱杰信科技有限公司	ST	Crystal　		
+深圳市乐沃天晟科技有限公司	ST	Crystal　		
+深圳市立创芯科技有限公司	ST	Crystal　		
+深圳市利锋微顺达电子科技有限公司	ST	Crystal　		
+深圳市联科器件有限公司	ST	Crystal　		
+深圳市联球电子元器件有限公司	ST	Crystal　		
+深圳市联耀欣科技有限公司	ST	Crystal　		
+深圳市猎芯科技有限公司	ST	Crystal　		
+深圳市林芯诚电子科技有限公司	ST	Crystal　		
+深圳市麟润通科技有限公司	ST	Crystal　		
+深圳市凌志盈电子有限公司	ST	Crystal　		
+深圳市龙耿祥电子经营部	ST	Crystal　		
+深圳市龙阳电子有限公司	ST	Crystal　		
+深圳市迈的特电子有限公司	ST	Crystal　		
+深圳市贸泽电子有限公司	ST	Crystal　		
+深圳市美捷诚微电子科技有限公司	ST	Crystal　		
+深圳市美强科技有限公司	ST	Crystal　		
+深圳市美裕达电子有限公司	ST	Crystal　		
+深圳市明嘉瑞科技有限公司	ST	Crystal　		
+深圳市明鑫锦业科技有限公司	ST	Crystal　		
+深圳市鸣芯科技有限公司	ST	Crystal　		
+深圳市欧尔伽科技发展有限公司	ST	Crystal　		
+深圳市攀达电子有限公司	ST	Crystal　		
+深圳市普锐安科技有限公司	ST	Crystal　		
+深圳市启铭芯电子有限公司	ST	Crystal　		
+深圳市启穗电子科技有限公司	ST	Crystal　		
+深圳市启星恒硕电子有限公司	ST	Crystal　		
+深圳市仟百纳电子科技有限公司	ST	Crystal　		
+深圳市荣丰杰电子商行	ST	Crystal　		
+深圳市荣盛万鑫科技有限公司	ST	Crystal　		
+深圳市瑞彩电子技术有限公司	ST	Crystal　		
+深圳市瑞晟达科技发展有限公司	ST	Crystal　		
+深圳市三羊科技有限公司	ST	Crystal　		
+深圳市森蓝微电子有限公司	ST	Crystal　		
+深圳市尚顶电子有限公司	ST	Crystal　		
+深圳市尚品诚源电子有限公司	ST	Crystal　		
+深圳市盛电电子有限公司	ST	Crystal　		
+深圳市盛飞扬电子有限公司	ST	Crystal　		
+深圳市顺乐宏业科技有限公司	ST	Crystal　		
+深圳市顺芯微半导体有限公司	ST	Crystal　		
+深圳市斯威盾电子有限公司	ST	Crystal　		
+深圳市太立司曼科技有限公司	ST	Crystal　		
+深圳市旺达微电子有限公司	ST	Crystal　		
+深圳市伟诺源电子科技有限公司	ST	Crystal　		
+深圳市无夜科技有限公司	ST	Crystal　		
+深圳市希斯特电子有限公司	ST	Crystal　		
+深圳市祥鹤盈科科技有限公司	ST	Crystal　		
+深圳市祥利和电子科技有限公司	ST	Crystal　		
+深圳市芯宝科技有限公司	ST	Crystal　		
+深圳市芯海驱动科技有限公司	ST	Crystal　		
+深圳市芯凯迪科技有限公司	ST	Crystal　		
+深圳市芯毅科技有限公司	ST	Crystal　		
+深圳市新财合电子有限公司	ST	Crystal　		
+深圳市新辰威科技有限公司	ST	Crystal　		
+深圳市新高佳电子有限公司	ST	Crystal　		
+深圳市新恒通顺电子有限公司	ST	Crystal　		
+深圳市信盛荣鑫科技有限公司	ST	Crystal　		
+深圳市星联讯电子有限公司	ST	Crystal　		
+深圳市雄芯源科技有限公司	ST	Crystal　		
+深圳市轩嘉顺电子有限公司	ST	Crystal　		
+深圳市雅全电子有限公司	ST	Crystal　		
+深圳市烨思电子有限公司	ST	Crystal　		
+深圳市亿威盛创科技有限公司	ST	Crystal　		
+深圳市亿伟达科技有限公司	ST	Crystal　		
+深圳市易盛达通电子技术有限公司	ST	Crystal　		
+深圳市易讯博科技有限公司	ST	Crystal　		
+深圳市翼芯科技有限公司	ST	Crystal　		
+深圳市英贝尔电子有限公司	ST	Crystal　		
+深圳市英丹电子有限公司	ST	Crystal　		
+深圳市友利电子信息科技有限公司	ST	Crystal　		
+深圳市佑科电子有限公司	ST	Crystal　		
+深圳市宇星盛科技有限公司	ST	Crystal　		
+深圳市裕凌电子有限公司	ST	Crystal　		
+深圳市裕远电子科技有限公司	ST	Crystal　		
+深圳市誉德利电子经营部	ST	Crystal　		
+深圳市誉光国际进出口有限公司	ST	Crystal　		
+深圳市源隆芯科技有限公司	ST	Crystal　		
+深圳市源芯正品科技有限公司	ST	Crystal　		
+深圳市越睿科技有限公司	ST	Crystal　		
+深圳市展信泰科技有限公司	ST	Crystal　		
+深圳市展卓信电子有限公司	ST	Crystal　		
+深圳市长城达电子科技有限公司	ST	Crystal　		
+深圳市正汇达电子有限公司	ST	Crystal　		
+深圳市正源微电子科技有限公司	ST	Crystal　		
+深圳市中盛大恒科技有限公司	ST	Crystal　		
+深圳市中天众合科技有限公司	ST	Crystal　		
+深圳市众智联合电子科技有限公司	ST	Crystal　		
+深圳市壮越微电子有限公司	ST	Crystal　	Sunny　	
+深圳市卓然新锐科技有限公司	ST	Crystal　		
+深圳市梓诺电子科技有限公司	ST	Crystal　		
+深圳舜鼎电子信息技术有限公司	ST	Crystal　		
+深圳万吉时代科技有限公司	ST	Crystal　		
+深圳微元盛世科技有限公司	ST	Crystal　		
+深圳韦得科技有限公司	ST	Crystal　		
+深圳维迪奥斯电子科技有限公司	ST	Crystal　		
+深圳毅迪斯航科技有限公司	ST	Crystal　		
+深圳佑能电子有限公司	ST	Crystal　		
+深圳至上芯城电子科技有限公司	ST	Crystal　		
+圣邦科技股份有限公司	ST	Crystal　		
+盛博电子有限公司	ST	Crystal　		
+苏州安玥电子有限公司	ST	Crystal　		
+苏州博特维智能科技有限公司	ST	Crystal　		
+苏州瑞邦微电子有限公司	ST	Crystal　		
+腾龙技术有限公司	ST	Crystal　		
+无锡海明威电子科技有限公司	ST	Crystal　		
+武汉力源信息技术股份有限公司	ST	Crystal　		
+西庚大酉有限公司	ST	Crystal　		
+先锋电子技术有限公司	ST	Crystal　		
+香港宝文物流有限公司	ST	Crystal　		
+香港華宇奇科技有限公司	ST	Crystal　		
+香港思新有限公司	ST	Crystal　		
+香港信立安电子有限公司	ST	Crystal　		
+芯源科技亚洲有限公司	ST	Crystal　		
+新茂电子有限公司	ST	Crystal　		
+轩哲电子有限公司	ST	Crystal　		
+越特电子科技（北京）有限公司	ST	Crystal　		
+云帆技术有限公司	ST	Crystal　		
+云汉芯城（上海）电子科技有限公司	ST	Crystal　		
+致远电子有限公司	ST	Crystal　		
+深圳市安富捷电子有限公司	ST	crystal		
+深圳市千拓科技有限公司	ST	crystal		
+深圳市英索实业有限公司	ST	crystal		
+阿可卑斯（深圳）科技有限公司	ST	crystal		
+佰利兴业	ST	crystal		
+倍帝斯科技(深圳)有限公司	ST	crystal		
+睿翔创展	ST	crystal		
+深圳容之芯科技有限公司	ST	crystal		
+深圳市佰利兴业科技有限公司	ST	crystal		
+深圳市宝星雅创科技有限公司	ST	crystal		
+深圳市城南芯科技有限公司	ST	crystal		
+深圳市达锐安电子有限公司	ST	crystal		
+深圳市和世达电子科技有限公司	ST	crystal		
+深圳市恒创信科技有限公司	ST	crystal		
+深圳市华富睿科技有限公司	ST	crystal		
+深圳市旗芯电子有限公司	ST	crystal		
+深圳市善芯微电子有限公司	ST	crystal		
+深圳市芯创晔电子有限公司	ST	crystal		
+深圳市永智通电子有限公司	ST	crystal		
+深圳市云中傲科技有限公司	ST	crystal		
+深圳市安睿昌电子科技有限公司	ST	crystal		
+北京航天龙达电子科技有限公司	ST	Spring　		
+北京利科益华科技有限公司	ST	Spring　		
+北京志成伟业电子有限公司	ST	Spring　		
+恒富（香港）电子有限公司	ST	Spring　		
+深圳明嘉瑞科技有限公司	ST	Spring　		
+深圳世创兴科技有限公司	ST	Spring　		
+深圳市合利达微科技有限公司	ST	Spring　		
+深圳市恒镇海电子有限公司	ST	Spring　		
+深圳市凯新达科技有限公司	ST	Spring　		
+深圳市凌颖科技有限公司	ST	Spring　		
+深圳市南方天信科技有限公司	ST	Spring　	Sunny　	Crystal　
+深圳市荣德伟业电子有限公司	ST	Spring　		
+深圳市四雄微电子有限公司	ST	Spring　	Crystal　	Sunny　
+深圳市维兰德科技有限公司	ST	Spring　		
+深圳市芯创联科技有限公司	ST	Spring　		
+深圳市芯启未来科技有限公司	ST	Spring　	Sunny　	
+深圳市昱尚科技有限公司	ST	Spring　		
+天津方等科技有限公司	ST	Spring　		
+芯莱购（深圳）半导体电子有限公司	ST	Spring　		
+BON WIN TECHNOLOGY LIMITED	SD	Sunny　		
+FUTURE ELECTRONICS （HONG KONG）LIMITED	SD	Sunny　		
+HEBEI FAR-EAST HARRIS COMMUNICATION CO LIMITED	ST	Sunny　		
+PRESEMIS TECHNOLOGY CO., LIMITED.	ST	Sunny　		
+TOP IC (HK) TECHNOLOGY CO.LTD	ST	Sunny　		
+安捷源（深圳）科技有限公司	ST	Sunny　		
+安芯易电子商务（深圳）有限公司	ST	Sunny　	Susan	Crystal
+北京恒昌亚怡科技有限公司	ST	Sunny　	crystal	
+北京恒成伟业电子有限公司	ST	Sunny　		
+北京瑜众达电子科技有限公司	ST	Sunny　		
+北京中电宝盛科技发展有限公司	ST	Sunny　		
+诚泰国际实业有限公司	ST	Sunny　		
+高勤科技(香港)有限公司	ST	Sunny　		
+杭州芯程科技有限公司杭州	ST	Sunny　		
+宏创汇科技有限公司	ST	Sunny　		
+华夏芯科技香港有限公司香港	ST	Sunny　		
+集能芯（深圳）科技有限公司	ST	Sunny　		
+骏煜科技（深圳）有限公司深圳	ST	Sunny　		
+科伟奇（北京、深圳）电子有限公司	ST	Sunny　		
+科芯科技香港有限公司	ST	Sunny　		
+南京金芯盛科技有限公司	ST	Sunny　		
+上海复浦电子科技有限公司	ST	Sunny　		
+上海欢成电子科技有限公司	ST	Sunny　		
+上海嘉一电子科技有限公司	ST	Sunny　		
+上海瑾暄电子科技有限公司	ST	Sunny　		
+上海芯锐实业有限公司	ST	Sunny　		
+深圳博弘科微电子有限公司	ST	Sunny　		
+深圳华宝泰电子有限公司	ST	Sunny　		
+深圳美满电子科技有限公司	ST	Sunny　		
+深圳前海硬之城信息技术有限公司	ST	Sunny　		
+深圳市昂捷电子有限公司深圳	ST	Sunny　		
+深圳市佰利兴业科技有限公司	ST	Sunny　		
+深圳市佰誉科技有限公司.	ST	Sunny　		
+深圳市铖瑞科技有限公司深圳	ST	Sunny　		
+深圳市楚昊科技有限公司深圳	ST	Sunny　		
+深圳市德睿创科技有限公司	ST	Sunny　		
+深圳市鼎森电子科技有限公司	ST	Sunny　		
+深圳市鼎志诚电子有限公司	ST	Sunny　		
+深圳市东芯世纪电子有限公司	ST	Sunny　		
+深圳市多亚科技有限公司深圳	ST	Sunny　		
+深圳市恩智科技有限公司	ST	Sunny　		
+深圳市凡芯诺世电子有限公司	ST	Sunny　		
+深圳市福田区晶优电子经营部	ST	Sunny　		
+深圳市福田区美盛创展电子经营部	ST	Sunny　		
+深圳市固勤科技有限公司	ST	Sunny　	crystal	
+深圳市光驰电子有限公司	ST	Sunny　		
+深圳市国瑞芯通科技有限公司	ST	Sunny　		
+深圳市国芯通科技有限公司	ST	Sunny　		
+深圳市浩芯通科技有限公司深圳	ST	Sunny　		
+深圳市恒隆腾达科技有限公司	ST	Sunny　		
+深圳市恒芯绿能科技有限公司	ST	Sunny　		
+深圳市鸿宇亮达电子有限公司	ST	Sunny　		
+深圳市华誉伟业电子有限公司	ST	Sunny　	crystal	
+深圳市嘉拓科技有限公司	ST	Sunny　		
+深圳市九方航科技有限公司	ST	Sunny　		
+深圳市聚创华科技有限公司	ST	Sunny　		
+深圳市铠盛业科技有限公司	ST	Sunny　		
+深圳市科冉科技有限公司	ST	Sunny　	susan	crystal
+深圳市科翔达电子有限公司	ST	Sunny　		
+深圳市陆和神州科技有限公司深圳	ST	Sunny　		
+深圳市铭亨电子经营部	ST	Sunny　		
+深圳市沛城电子科技有限公司	ST	Sunny　		
+深圳市鹏创达电子有限公司（鹏海达）	ST	Sunny　	Crystal　	
+深圳市旗芯电子有限公司	ST	Sunny　	Susan　	
+深圳市启锐芯科技有限公司	ST	Sunny　		
+深圳市睿翔创展科技有限公司	ST	Sunny　		
+深圳市三水雅创电子有限公司	ST	Sunny　		
+深圳市善芯微电子有限公司	ST	Sunny　		
+深圳市圣莱尔电子有限公司	ST	Sunny　	Spring　	
+深圳市胜雅轩科技有限公司	ST	Sunny　		
+深圳市思立科电子有限公司	ST	Sunny　	Susan　	Crystal　
+深圳市四方联达科技有限公司	ST	Sunny　		
+深圳市天芯半导体科技有限公司	ST	Sunny　		
+深圳市向光半导体有限公司	ST	Sunny　		
+深圳市芯必得电子科技有限公司	ST	Sunny　		
+深圳市芯立阳电子技术有限公司	ST	Sunny　		
+深圳市芯能电子有限公司	ST	Sunny　		
+深圳市芯蕊芯科技有限公司	ST	Sunny　		
+深圳市芯泰隆电子有限公司	ST	Sunny　		
+深圳市芯源通贸科技有限公司	ST	Sunny　		
+深圳市欣耀兴科技有限公司	ST	Sunny　		
+深圳市星辰同创科技有限公司	ST	Sunny　		
+深圳市亿诺信息技术有限公司	ST	Sunny　		
+深圳市元极创新电子有限公司	ST	Sunny　		
+深圳市垣利源科技有限公司	ST	Sunny　		
+深圳市至诚芯业科技有限公司	ST	Sunny　		
+深圳市中航军工半导体有限公司	ST	Sunny　		
+深圳市中芯伟业科技有限公司.	ST	Sunny　		
+深圳市中正汇通电子设备有限公司（贝乐实业同一家）	ST	Sunny　		
+深圳市晫芯微电子有限公司	ST	Sunny　		
+深圳市紫诺翔科技有限公司.	ST	Sunny　		
+深圳芯麟科技有限公司	ST	Sunny　	Crystal　	
+深圳友途致远技术有限公司	ST	Sunny　		
+苏州瑞邦微电子有限公司苏州	ST	Sunny　		
+香港恒实科技有限公司深圳	ST	Sunny　		
+芯源科技亚洲有限公司	ST	Sunny　		
+兴达电子股份有限公司(兴联达电子同一家)	ST	Sunny　		
+亦芯科技（香港）有限公司	ST	Sunny　		
+增利（上海）电子科技有限公司	ST	Sunny　		
+浙江禹数科技有限公司.	ST	Sunny　		
+智科博芯（北京）科技有限公司	ST	Sunny　		
+中恒永盛（深圳）科技有限公司	ST	Sunny　		
+Esteem Microelectronics Pte. Ltd	ST	Susan　		
+G 4 Sourcing	ST	Susan　		
+HONGKONG HUIZHONGDINGTAI ELECTRONIC TECHNOLOGY LIMITED	ST	Susan　		
+LISHUN ELECTRONICS (HK) CO., LIMITED	SD	Susan　		
+Mission 21, Inc	ST	Susan　		
+NESTAR ELECTRONICS LIMITED	ST	Susan　		
+SKY CHIP(HK)TECHNOLOGY LIMITED	ST	Susan　		
+SUNRON SUPPLY CHAIN (HK) LIMITED	ST	Susan　		
+TTI Asia Shenzhen	SD	Susan　		
+Velocity Electronics	ST	Susan　		
+北京搏立微科电子有限公司	ST	Susan　		
+北京英赛尔科技有限公司	ST	Susan　		
+广州鼎悦电子科技有限公司	ST	Susan　		
+广州匠达电子有限公司	ST	Susan　		
+湖南省山口电子有限公司	ST	Susan　		
+美信供应链(香港)有限公司	ST	Susan　		
+上海千洲实业有限公司	ST	Susan　		
+深圳全芯动力电子科技有限公司	ST	Susan　		
+深圳市博信恒业科技有限公司	ST	Susan　		
+深圳市德会鑫科技有限公司	ST	Susan　		
+深圳市鼎承进出口有限公司	ST	Susan　		
+深圳市鼎芯诚电子科技有限公司	ST	Susan　		
+深圳市徽创达科技有限公司	ST	Susan　		
+深圳市嘉诚微电子科技有限公司	ST	Susan　		
+深圳市金芯阳科技有限公司	ST	Susan　		
+深圳市锦天芯科技有限公司	ST	Susan　		
+深圳市钜能兴业电子有限公司	ST	Susan　		
+深圳市克林利科技有限公司	ST	Susan　		
+深圳市凝聚力电子有限公司	ST	Susan　		
+深圳市鹏程万里半导体有限公司	ST	Susan　	Spring　	Sunny　
+深圳市森亿欧科技有限公司	ST	Susan　		
+深圳市威能腾达科技有限公司	ST	Susan　		
+深圳市维佳盛电子有限公司	ST	Susan　		
+深圳市芯盛恒达电子有限公司	ST	Susan　	Sunny　	
+深圳市芯泰城科技有限公司	ST	Susan　		
+深圳市欣瑞智科技有限公司	ST	Susan　	Sunny　	
+深圳市锌源丰电子集团有限公司	ST	Susan　		
+深圳市云科盛科技有限公司	ST	Susan　		
+深圳羽通达电子有限公司	ST	Susan　	Sunny　	
+圣禾堂（深圳）电子科技有限公司	ST	Susan　	Crystal　	Sunny　
+香港彼富国际有限公司	ST	Susan　		
+S
+
+
+shared_users统计数据
+select user_id, count(0) from partner_shared_users_rel group by user_id order by 2;
+ user_id | count
+---------+-------
+      41 |     1
+      44 |     3
+      23 |     6
+      29 |    11
+      43 |    14
+      25 |    17
+      38 |    28
+      27 |    36
+      21 |    40
+      22 |    50
+      39 |    51
+      30 |    66
+      26 |    98
+      31 |   117
+      28 |   222
+      
+核对下每个用户数据，比如Alan id=21，可以看见40条记录；
+请用xmlrpc核对下，用alan用户，密码：Odoo123456，可以看见多少数据？      
+
+
+请用xmlrpc核对下：以下普通用户 登录后，默认可以看见的联系人数量
+ Crystal |   222
+ Emma    |     1
+ Amanda  |     6
+ Suwen   |     3
+ Susan   |    51
+ Cathy   |    17
+ Spring  |    28
+ Milne   |    66
+ Lillian |    11
+ Yuan    |    14
+ Huabing |    50
+ Sunny   |   118
+ Alan    |    40
+ Ferpa   |    98
+ 
+完成数据核对后，如不对，请自动修复。
+最后请写个修改总结，总结今天的主要修改点。代码请尽量多写注释、
+ 
+ 

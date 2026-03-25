@@ -1,0 +1,8 @@
+[options]
+addons_path = ./odoo/addons
+admin_passwd = Odoo123456
+db_host = 129.150.51.7
+db_port = 5432
+db_user = odoo
+db_password = odoo
+database=odb

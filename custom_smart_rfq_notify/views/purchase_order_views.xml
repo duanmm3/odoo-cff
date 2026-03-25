@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 修改采购订单表单视图 -->
+    <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- 智能竞价状态栏 -->
+            <header position="inside">
+                <field name="quote_stage" widget="statusbar" 
+                    statusbar_visible="draft,primary_contact,bidding,quoted,confirmed"
+                    invisible="state != 'draft'"/>
+            </header>
+
+            <!-- 添加智能竞价字段 -->
+            <field name="partner_ref" position="after">
+                <field name="primary_vendor_id" 
+                    invisible="state != 'draft'"
+                    groups="purchase.group_purchase_user"/>
+                <field name="quote_timeout" 
+                    invisible="state != 'draft'"
+                    groups="purchase.group_purchase_user"/>
+            </field>
+
+            <!-- 按钮区域添加智能操作 -->
+            <button name="action_quotation_send" position="after">
+                <button name="action_notify_primary_vendor" 
+                    type="object"
+                    string="通知优先供应商"
+                    invisible="quote_stage != 'draft' or state != 'draft'"
+                    class="btn-primary"
+                    groups="purchase.group_purchase_user"/>
+                <button name="action_start_bidding" 
+                    type="object"
+                    string="开始竞价"
+                    invisible="quote_stage not in ('primary_contact', 'bidding') or state != 'draft'"
+                    class="btn-primary"
+                    groups="purchase.group_purchase_user"/>
+                <button name="action_create_quote_record" 
+                    type="object"
+                    string="记录报价"
+                    invisible="state != 'draft'"
+                    class="btn-secondary"
+                    groups="purchase.group_purchase_user"/>
+            </button>
+
+            <!-- 添加报价页面 -->
+            <notebook position="inside">
+                <page string="供应商报价" name="vendor_quotes"
+                    invisible="state != 'draft'">
+                    <group>
+                        <field name="quote_ids" nolabel="1">
+                            <list string="Quotes" decoration-success="price_total == best_quote_id.price_total">
+                                <field name="vendor_id"/>
+                                <field name="price_subtotal" widget="monetary"/>
+                                <field name="price_tax" widget="monetary"/>
+                                <field name="price_total" widget="monetary"/>
+                                <field name="quoted_at"/>
+                                <button name="action_select_quote" 
+                                    type="object" 
+                                    icon="fa-check"
+                                    string="选择此报价"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </notebook>
+
+            <!-- 提示信息 -->
+            <div position="after">
+                <div class="alert alert-info" role="alert" 
+                    invisible="quote_stage != 'primary_contact'">
+                    <i class="fa fa-clock-o"/>
+                    已通知优先供应商报价，等待中... 
+                    (<field name="primary_notified_at" readonly="1"/>)
+                </div>
+                <div class="alert alert-warning" role="alert" 
+                    invisible="quote_stage != 'bidding'">
+                    <i class="fa fa-gavel"/>
+                    竞价已开始！已通知所有供应商竞价。
+                </div>
+            </div>
+        </field>
+    </record>
+
+    <!-- 修改采购订单列表视图 -->
+    <record id="view_purchase_order_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.list.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="quote_stage" 
+                    invisible="state != 'draft'"
+                    decoration-warning="quote_stage == 'primary_contact'"
+                    decoration-success="quote_stage == 'bidding'"
+                    widget="badge"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- 采购搜索视图 -->
+    <record id="view_purchase_order_search_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.search.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="quote_stage"/>
+                <filter string="待优先供应商报价" name="quote_primary" 
+                    domain="[('quote_stage', '=', 'primary_contact')]"/>
+                <filter string="竞价中" name="quote_bidding" 
+                    domain="[('quote_stage', '=', 'bidding')]"/>
+            </field>
+        </field>
+    </record>
+</odoo>

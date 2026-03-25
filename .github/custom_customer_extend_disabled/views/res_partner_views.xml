@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 联系人菜单 action - 默认显示自己创建或共享的联系人 -->
+    <record id="action_contacts_filtered" model="ir.actions.act_window">
+        <field name="name">Contacts</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{"search_default_my_contacts": 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first contact
+            </p>
+        </field>
+    </record>
+
+    <!-- 显示共享联系人的 Action -->
+    <record id="action_contacts_shared" model="ir.actions.act_window">
+        <field name="name">Shared Contacts</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{"search_default_shared_with_me": 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No shared contacts
+            </p>
+        </field>
+    </record>
+
+    <!-- 扩展联系人表单视图 -->
+    <record id="view_partner_form_extended" model="ir.ui.view">
+        <field name="name">res.partner.form.extended</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- 在基本信息部分添加客户/供应商信息 -->
+            <xpath expr="//page[@name='internal_notes']" position="before">
+                <page string="拓展信息">
+                    <group string="Extend Info">
+                        <group>
+                            <field name="partner_type" widget="radio"/>
+                            <field name="partner_code" readonly="1"/>
+                            <field name="customer_type" invisible="partner_type not in ['customer', 'both']"/>
+                            <field name="supplier_type" invisible="partner_type not in ['supplier', 'both']"/>  
+                            <field name="customer_grade"/>
+                            <field name="customer_source"/>
+                            <field name="reconciliation_day"/>
+                        </group>
+                        <group>
+                            <field name="english_name"/>
+                            <field name="company_phone"/>
+                            <field name="mobile_phone"/>
+                            <field name="customer_tags"/>
+                            <field name="tax_rate"/>
+                            <field name="shared_users" widget="many2many_tags"/>
+                            <field name="customer_currency"/>
+                            <field name="payment_method"/>
+                            <field name="invoice_day"/>
+                        </group>
+                    </group>
+                    
+                                      
+                    <group string="Files Upload">
+                        <group>
+                            <label for="business_card" string="1. 名片"/>
+                            <div class="o_attachment o_form_field o_form_uri">
+                                <field name="business_card" filename="business_card_filename"/>
+                            </div>
+                        </group>
+                        <group>
+                            <label for="business_license" string="2. 营业执照"/>
+                            <div class="o_attachment o_form_field o_form_uri">
+                                <field name="business_license" filename="business_license_filename"/>
+                            </div>
+                        </group>
+                        <group>
+                            <label for="registration_certificate" string="3. 商业登记证/注册证书"/>
+                            <div class="o_attachment o_form_field o_form_uri">
+                                <field name="registration_certificate" filename="registration_certificate_filename"/>
+                            </div>
+                        </group>
+                        <group>
+                            <label for="payment_account" string="4. 付款账号/收款账号"/>
+                            <div class="o_attachment o_form_field o_form_uri">
+                                <field name="payment_account" filename="payment_account_filename"/>
+                            </div>
+                        </group>
+                        <group>
+                            <label for="survey_form" string="5. 客户情况调查表/供应商情况调查表"/>
+                            <div class="o_attachment o_form_field o_form_uri">
+                                <field name="survey_form" filename="survey_form_filename"/>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            
+            <!-- 修改原有的联系人类型字段 -->
+            <xpath expr="//field[@name='company_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 联系人列表视图 -->
+    <record id="view_partner_tree_custom" model="ir.ui.view">
+        <field name="name">res.partner.tree.custom</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="priority">200</field>
+        <field name="arch" type="xml">
+            <xpath expr="//list/field[1]" position="before">
+                <field name="partner_code"/>
+            </xpath>
+            <xpath expr="//list/field[2]" position="after">
+                <field name="shared_users" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 扩展联系人搜索视图 -->
+    <record id="view_partner_filter_extended" model="ir.ui.view">
+        <field name="name">res.partner.filter.extended</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="共享给我" name="shared_with_me" domain="[('shared_users','in',[uid])]" invisible="1"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//separator[last()]" position="before">
+                <filter name="partner_type" string="Code" domain="[]" context="{'group_by': 'partner_type'}"/>
+                <filter name="customer_type" string="客户类型" domain="[]" context="{'group_by': 'customer_type'}"/>
+                <filter name="supplier_type" string="供应商类型" domain="[]" context="{'group_by': 'supplier_type'}"/>
+                <filter name="is_potential" string="潜在客户" domain="[('is_potential_customer', '=', True)]"/>
+                <filter name="customer_grade" string="客户等级" domain="[]" context="{'group_by': 'customer_grade'}"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="partner_type"/>
+                <field name="customer_type" invisible="1"/>
+                <field name="supplier_type" invisible="1"/>
+                <field name="partner_code"/>
+                <field name="customer_grade"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- 为管理员恢复删除按钮 -->
+    <record id="view_partner_tree_manager_delete" model="ir.ui.view">
+        <field name="name">res.partner.tree.manager.delete</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="custom_customer_extend.view_partner_tree_custom"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="attributes">
+                <attribute name="delete">true</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 添加切换到共享联系人的按钮 -->
+    <record id="view_partner_search_shared" model="ir.ui.view">
+        <field name="name">res.partner.search.shared</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//filter[@name='inactive']" position="before">
+                    <separator/>
+                    <filter string="共享给我" name="shared_with_me" domain="[('shared_users','in',[uid])]"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+</odoo>

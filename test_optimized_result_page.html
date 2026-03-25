@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimized Price Result Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .header-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            color: #337ab7;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        
+        .download-button {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        
+        .status-info {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #343a40;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .supplier-badge {
+            background: #007bff;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .price-rmb {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .search-again-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        
+        .no-results {
+            background: #fff3cd;
+            color: #856404;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 优化后的结果页面示例 -->
+        <div class="header-card">
+            <div class="header-row">
+                <div>
+                    <a href="/price/query" class="back-button">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <h2 style="display: inline;">Query Results for: <strong>EP3C16F256I7N</strong></h2>
+                </div>
+                <div>
+                    <a href="/price/download/csv/EP3C16F256I7N" class="download-button">
+                        <i class="fas fa-download"></i> Download CSV
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 精简的状态信息 -->
+            <div class="status-info">
+                <strong>Found 23 quotes</strong> - Query Time: 2026-03-12T03:02:14.231032
+            </div>
+        </div>
+        
+        <!-- 价格表格 -->
+        <div class="table-container">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">#</th>
+                            <th>Supplier</th>
+                            <th>Part Number</th>
+                            <th>Manufacturer</th>
+                            <th style="text-align: right;">Price</th>
+                            <th style="text-align: right;">RMB</th>
+                            <th style="text-align: center;">Stock</th>
+                            <th style="text-align: center;">MOQ</th>
+                            <th>Lead Time</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 示例数据行 -->
+                        <tr>
+                            <td style="text-align: center; color: #999;">1</td>
+                            <td><span class="supplier-badge">Mouser</span></td>
+                            <td><strong>EP3C16F256I7N</strong></td>
+                            <td>Altera</td>
+                            <td style="text-align: right;">
+                                <strong>574.99</strong>
+                                <small style="color: #999;">CNY</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">574.99</td>
+                            <td style="text-align: center;">91</td>
+                            <td style="text-align: center;">1</td>
+                            <td><small>112 Days</small></td>
+                            <td><small style="color: #999;">Mouser API</small></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; color: #999;">2</td>
+                            <td><span class="supplier-badge">Verified Electronics</span></td>
+                            <td><strong>EP3C16F256I7N</strong></td>
+                            <td>Altera Corporation</td>
+                            <td style="text-align: right;">
+                                <strong>17.38</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">124.35</td>
+                            <td style="text-align: center;">1153</td>
+                            <td style="text-align: center;">0</td>
+                            <td><small>-</small></td>
+                            <td><small style="color: #999;">OEMSecrets API</small></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; color: #999;">3</td>
+                            <td><span class="supplier-badge">Weyland Electronics</span></td>
+                            <td><strong>EP3C16F256I7N</strong></td>
+                            <td>Altera Corporation</td>
+                            <td style="text-align: right;">
+                                <strong>26.31</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">188.15</td>
+                            <td style="text-align: center;">576</td>
+                            <td style="text-align: center;">0</td>
+                            <td><small>-</small></td>
+                            <td><small style="color: #999;">OEMSecrets API</small></td>
+                        </tr>
+                        <!-- 更多数据行... -->
+                        <tr>
+                            <td style="text-align: center; color: #999;">23</td>
+                            <td><span class="supplier-badge">Qwen AI</span></td>
+                            <td><strong>EP3C16F256I7N</strong></td>
+                            <td>Intel</td>
+                            <td style="text-align: right;">
+                                <strong>45.50</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">325.35</td>
+                            <td style="text-align: center;">50</td>
+                            <td style="text-align: center;">10</td>
+                            <td><small>2-4 weeks</small></td>
+                            <td><small style="color: #999;">Qwen AI</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 搜索另一个IC按钮 -->
+        <div>
+            <a href="/price/query" class="search-again-button">
+                <i class="fas fa-search"></i> Search Another IC
+            </a>
+        </div>
+        
+        <hr style="margin: 40px 0;">
+        
+        <!-- 无结果情况示例 -->
+        <div class="no-results">
+            <h4><i class="fas fa-exclamation-triangle"></i> No quotes found</h4>
+            <p>No price quotes were found for <strong>TEST12345</strong>.</p>
+            <p style="margin-top: 20px;">
+                <a href="/price/query" class="search-again-button">Try Another IC Model</a>
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // 添加简单的交互效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 表格行悬停效果
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = '#f8f9fa';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+            
+            // 按钮悬停效果
+            const buttons = document.querySelectorAll('.download-button, .search-again-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.opacity = '0.8';
+                    this.style.transform = 'translateY(-2px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError, AccessError
+
+
+class ResPartner(models.Model):
+    _inherit = "res.partner"
+
+    # 客户/供应商标记
+    partner_type = fields.Selection([
+        ('customer', '客户'),
+        ('supplier', '供应商'),
+        ('both', '客户和供应商'),
+        ('other', '其他')
+    ], string='客户/供应商标记', default='other', required=True)
+    
+    # 客户类型
+    customer_type = fields.Selection([
+        ('CF', '国内工厂 (CF)'),
+        ('CT', '国内贸易 (CT)'),
+        ('OF', '国外工厂 (OF)'),
+        ('OT', '国外贸易 (OT)')
+    ], string='客户类型')
+    
+    # 供应商类型
+    supplier_type = fields.Selection([
+        ('ST', '贸易 (ST)'),
+        ('SF', '工厂 (SF)'),
+        ('SD', '代理 (SD)'),
+        ('SE', '呆滞 (SE)')
+    ], string='供应商类型')
+    
+    # 客户/供应商代码
+    partner_code = fields.Char(string='Code', readonly=True, copy=False, index=True)
+    
+    # 客户等级
+    customer_grade = fields.Char(string='客户等级', help='例如: 0,5a,5b,5c,10a,10b,10c')
+    
+    # 客户来源
+    customer_source = fields.Selection([
+        ('1', '展会'),
+        ('2', '互联网'),
+        ('3', '广告')
+    ], string='客户来源')
+    
+    # 对账日
+    reconciliation_day = fields.Selection([
+        (str(i), str(i)) for i in range(1, 32)
+    ], string='对账日 (每月)')
+    
+    # 英文名字
+    english_name = fields.Char(string='英文名字')
+    
+    # 公司电话
+    company_phone = fields.Char(string='公司电话')
+    
+    # 移动电话
+    mobile_phone = fields.Char(string='移动电话')
+    
+    # 客户标签
+    customer_tags = fields.Char(string='客户标签')
+    
+    # 税率
+    tax_rate = fields.Selection([
+        ('0.1300', '13%'),
+        ('0', '0%')
+    ], string='税率', default='0.1300')
+    
+    # 潜在客户
+    is_potential_customer = fields.Boolean(string='潜在客户', default=False)
+    
+    # 客户货币
+    customer_currency = fields.Selection([
+        ('USD', 'USD'),
+        ('CNY', 'CNY'),
+        ('HKD', 'HKD')
+    ], string='客户货币', default='CNY')
+    
+    # 付款方式
+    payment_method = fields.Selection([
+        ('100_prepaid', '100%预付'),
+        ('50_prepaid', '50%预付'),
+        ('cash', '现金')
+    ], string='付款方式')
+    
+    # 开票日
+    invoice_day = fields.Selection([
+        (str(i), str(i)) for i in range(1, 32)
+    ], string='开票日 (每月)')
+    
+    # 公司网址
+    website = fields.Char(string='公司网址')
+    
+    # 共享销售/采购（多对多关系，可多选内部用户）
+    shared_users = fields.Many2many(
+        'res.users',
+        'partner_shared_users_rel',
+        'partner_id',
+        'user_id',
+        string='共享销售/采购',
+        help='可多选内部用户（销售、采购、管理员等）'
+    )
+    
+    # 文件上传字段
+    business_card = fields.Binary(string='名片')
+    business_card_filename = fields.Char(string='名片文件名')
+    
+    business_license = fields.Binary(string='营业执照')
+    business_license_filename = fields.Char(string='营业执照文件名')
+    
+    registration_certificate = fields.Binary(string='商业登记证/注册证书')
+    registration_certificate_filename = fields.Char(string='登记证书文件名')
+    
+    payment_account = fields.Binary(string='付款账号/收款账号')
+    payment_account_filename = fields.Char(string='账号文件名')
+    
+    survey_form = fields.Binary(string='客户情况调查表/供应商情况调查表')
+    survey_form_filename = fields.Char(string='调查表文件名')
+    
+    @api.constrains('partner_type', 'customer_type', 'supplier_type')
+    def _check_partner_type_consistency(self):
+        for partner in self:
+            if partner.partner_type in ['customer', 'both'] and not partner.customer_type:
+                # 自动设置默认值而不是报错
+                partner.customer_type = 'CF'
+            if partner.partner_type in ['supplier', 'both'] and not partner.supplier_type:
+                # 自动设置默认值而不是报错
+                partner.supplier_type = 'ST'
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        current_user = self.env.user
+        for vals in vals_list:
+            if 'partner_code' not in vals or not vals.get('partner_code'):
+                vals['partner_code'] = self._generate_partner_code(vals)
+            
+            # 确保客户类型和供应商类型有默认值
+            partner_type = vals.get('partner_type', 'other')
+            if partner_type in ['customer', 'both'] and 'customer_type' not in vals:
+                vals['customer_type'] = 'CF'
+            if partner_type in ['supplier', 'both'] and 'supplier_type' not in vals:
+                vals['supplier_type'] = 'ST'
+        
+        partners = super(ResPartner, self).create(vals_list)
+        
+        # 自动将创建者添加到shared_users字段
+        for partner in partners:
+            if current_user and current_user.id and not current_user._is_public():
+                partner.write({'shared_users': [(4, current_user.id)]})
+        
+        return partners
+    
+    def write(self, vals):
+        # 确保客户类型和供应商类型有默认值
+        if 'partner_type' in vals:
+            partner_type = vals.get('partner_type')
+            if partner_type in ['customer', 'both'] and 'customer_type' not in vals:
+                # 检查当前值是否为空
+                for partner in self:
+                    if not partner.customer_type:
+                        vals['customer_type'] = 'CF'
+                        break
+            if partner_type in ['supplier', 'both'] and 'supplier_type' not in vals:
+                # 检查当前值是否为空
+                for partner in self:
+                    if not partner.supplier_type:
+                        vals['supplier_type'] = 'ST'
+                        break
+        
+        # 调用父类的write方法
+        result = super(ResPartner, self).write(vals)
+        
+        # 如果客户类型或供应商类型发生变化，需要更新代码
+        if 'customer_type' in vals or 'supplier_type' in vals or 'partner_type' in vals:
+            for partner in self:
+                # 获取当前值
+                current_vals = {
+                    'partner_type': partner.partner_type,
+                    'customer_type': partner.customer_type,
+                    'supplier_type': partner.supplier_type,
+                }
+                new_code = self._generate_partner_code(current_vals)
+                # 直接更新数据库，避免递归
+                self.env.cr.execute(
+                    "UPDATE res_partner SET partner_code = %s WHERE id = %s",
+                    (new_code, partner.id)
+                )
+        
+        return result
+    
+    def _generate_partner_code(self, vals):
+        partner_type = vals.get('partner_type', 'other')
+        
+        # 当partner_type为'both'时，优先使用客户类型
+        if partner_type == 'both':
+            # 优先使用客户类型
+            if vals.get('customer_type'):
+                prefix = vals.get('customer_type', 'CF')
+                field_to_check = 'customer_type'
+            else:
+                prefix = vals.get('supplier_type', 'ST')
+                field_to_check = 'supplier_type'
+        elif partner_type in ['customer', 'both']:
+            prefix = vals.get('customer_type', 'CF')
+            field_to_check = 'customer_type'
+        elif partner_type in ['supplier', 'both']:
+            prefix = vals.get('supplier_type', 'ST')
+            field_to_check = 'supplier_type'
+        else:
+            prefix = 'OTH'
+            field_to_check = 'partner_type'
+        
+        # 使用self.env来搜索，而不是self.search()
+        domain = []
+        if field_to_check == 'customer_type':
+            domain = [('customer_type', '=', prefix), ('partner_code', 'like', f'{prefix}%')]
+        elif field_to_check == 'supplier_type':
+            domain = [('supplier_type', '=', prefix), ('partner_code', 'like', f'{prefix}%')]
+        elif field_to_check == 'partner_type':
+            domain = [('partner_type', '=', 'other'), ('partner_code', 'like', f'{prefix}%')]
+        
+        existing_codes = self.env['res.partner'].search(domain).mapped('partner_code')
+        
+        if existing_codes:
+            # 提取数字部分并找到最大值
+            numbers = []
+            for code in existing_codes:
+                if code and code.startswith(prefix):
+                    try:
+                        num = int(code[len(prefix):])
+                        numbers.append(num)
+                    except ValueError:
+                        continue
+            if numbers:
+                next_num = max(numbers) + 1
+            else:
+                next_num = 1
+        else:
+            next_num = 1
+        
+        return f"{prefix}{next_num:05d}"
+    
+    @api.onchange('partner_type')
+    def _onchange_partner_type(self):
+        for record in self:
+            if record.partner_type in ['customer', 'both'] and not record.customer_type:
+                record.customer_type = 'CF'
+            if record.partner_type in ['supplier', 'both'] and not record.supplier_type:
+                record.supplier_type = 'ST'
+
+    
+    
+
+    

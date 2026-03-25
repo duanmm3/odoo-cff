@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 供应商RFQ列表页面 -->
+    <template id="portal_my_rfq" name="My RFQs">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">我的询价单</t>
+            
+            <div class="o_portal_container">
+                <div class="o_portal_doc_table table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>询价单号</th>
+                                <th>日期</th>
+                                <th>产品</th>
+                                <th>数量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="orders" t-as="order">
+                                <tr>
+                                    <td><t t-esc="order.name"/></td>
+                                    <td><t t-esc="order.date_order"/></td>
+                                    <td>
+                                        <t t-foreach="order.order_line[:3]" t-as="line">
+                                            <div><t t-esc="line.product_id.name"/></div>
+                                        </t>
+                                        <t t-if="len(order.order_line) > 3">
+                                            <div class="text-muted">... 还有 <t t-esc="len(order.order_line) - 3"/> 个产品</div>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <t t-foreach="order.order_line[:3]" t-as="line">
+                                            <div><t t-esc="line.product_qty"/> <t t-esc="line.product_uom_id.name"/></div>
+                                        </t>
+                                    </td>
+                                    <td>
+                                        <span t-att-class="'badge bg-' + ('warning' if order.quote_stage == 'primary_contact' else 'info')">
+                                            <t t-if="order.quote_stage == 'primary_contact'">待报价</t>
+                                            <t t-else="">竞价中</t>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a t-att-href="f'/my/rfq/{order.id}/quote'" class="btn btn-primary btn-sm">
+                                            立即报价
+                                        </a>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="not orders">
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        暂无待报价的询价单
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- 供应商报价页面 -->
+    <template id="portal_quote_rfq" name="Quote RFQ">
+        <t t-call="portal.portal_layout">
+            <t t-set="title">报价 - <t t-esc="order.name"/></t>
+            
+            <div class="o_portal_container">
+                <!-- 成功消息 -->
+                <t t-if="kwargs.get('success')">
+                    <div class="alert alert-success">
+                        报价提交成功！销售将尽快处理您的报价。
+                    </div>
+                </t>
+                
+                <!-- RFQ详情 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h4>询价单: <t t-esc="order.name"/></h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>询价日期:</strong> <t t-esc="order.date_order"/></p>
+                                <p><strong>要求交付日期:</strong> <t t-esc="order.date_planned"/></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>状态:</strong> 
+                                    <span class="badge bg-warning">
+                                        <t t-if="order.quote_stage == 'primary_contact'">待报价</t>
+                                        <t t-else="">竞价中</t>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- 产品明细 -->
+                        <h5 class="mt-4">产品明细</h5>
+                        <form method="POST" action="/my/rfq/submit_quote">
+                            <input type="hidden" name="order_id" t-att-value="order.id"/>
+                            
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>产品</th>
+                                        <th>数量</th>
+                                        <th>单位</th>
+                                        <th>单价</th>
+                                        <th>计划日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="order.order_line" t-as="line">
+                                        <t t-if="not line.display_type">
+                                            <tr>
+                                                <td><t t-esc="line.product_id.name"/></td>
+                                                <td><t t-esc="line.product_qty"/></td>
+                                                <td><t t-esc="line.product_uom_id.name"/></td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="number" 
+                                                               step="0.01" 
+                                                               t-att-name="'price_%s' % line.id"
+                                                               t-att-value="line.price_unit"
+                                                               class="form-control"
+                                                               required="1"/>
+                                                        <span class="input-group-text"><t t-esc="order.currency_id.name"/></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="date" 
+                                                           t-att-name="'date_%s' % line.id"
+                                                           t-att-value="line.date_planned"
+                                                           class="form-control"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </tbody>
+                            </table>
+                            
+                            <!-- 备注 -->
+                            <div class="form-group mt-3">
+                                <label>备注:</label>
+                                <textarea name="note" class="form-control" rows="3" 
+                                          placeholder="请输入您的备注或说明"></textarea>
+                            </div>
+                            
+                            <!-- 提交按钮 -->
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    提交报价
+                                </button>
+                                <a href="/my/rfq" class="btn btn-secondary ml-2">
+                                    返回列表
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

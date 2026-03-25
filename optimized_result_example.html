@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimized Price Result Page with Search URLs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        
+        .header-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            color: #337ab7;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        
+        .download-button {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        
+        .legend-box {
+            background: #e7f3ff;
+            color: #004085;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .legend-box h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        
+        .status-info {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #343a40;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .supplier-badge {
+            background: #007bff;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .price-rmb {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .search-again-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        
+        .url-preview {
+            font-size: 11px;
+            color: #666;
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 3px;
+            margin-top: 5px;
+            word-break: break-all;
+            font-family: monospace;
+            max-height: 60px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .col-explanation {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .price-highlight {
+            background-color: #fff3cd !important;
+        }
+        
+        .best-price {
+            background-color: #d4edda !important;
+            font-weight: bold;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .info-item {
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .info-item:last-child {
+            margin-right: 0;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .info-value {
+            color: #212529;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 优化后的结果页面示例 -->
+        <div class="header-card">
+            <div class="header-row">
+                <div>
+                    <a href="/price/query" class="back-button">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <h2 style="display: inline;">Query Results for: <strong>EP3C16Q240C8N</strong></h2>
+                </div>
+                <div>
+                    <a href="/price/download/csv/EP3C16Q240C8N" class="download-button">
+                        <i class="fas fa-download"></i> Download CSV
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 精简的状态信息 -->
+            <div class="status-info">
+                <strong>Found 23 quotes</strong> - Query Time: 2026-03-12T03:02:14.231032
+            </div>
+            
+            <!-- 列解释 -->
+            <div class="legend-box">
+                <h4><i class="fas fa-info-circle"></i> Column Explanations:</h4>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">MOQ:</span>
+                        <span class="info-value">Minimum Order Quantity - The smallest quantity you can purchase from this supplier.</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Lead Time:</span>
+                        <span class="info-value">Estimated delivery time from order placement to receipt.</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Search URL:</span>
+                        <span class="info-value">Direct link to the product page on the supplier's website.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 价格表格 -->
+        <div class="table-container">
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">#</th>
+                            <th>Supplier</th>
+                            <th>Part Number</th>
+                            <th>Manufacturer</th>
+                            <th style="text-align: right;">Price</th>
+                            <th style="text-align: right;">RMB</th>
+                            <th style="text-align: center;">Stock</th>
+                            <th style="text-align: center;">
+                                <span class="tooltip">MOQ
+                                    <span class="tooltiptext">Minimum Order Quantity - The smallest quantity you can purchase</span>
+                                </span>
+                            </th>
+                            <th style="text-align: left;">
+                                <span class="tooltip">Lead Time
+                                    <span class="tooltiptext">Estimated delivery time from order to receipt</span>
+                                </span>
+                            </th>
+                            <th>Source</th>
+                            <th>Search URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 最佳价格示例 -->
+                        <tr class="best-price">
+                            <td style="text-align: center; color: #999;">1</td>
+                            <td><span class="supplier-badge">Mouser</span></td>
+                            <td><strong>EP3C16Q240C8N</strong></td>
+                            <td>Altera</td>
+                            <td style="text-align: right;">
+                                <strong>574.99</strong>
+                                <small style="color: #999;">CNY</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">574.99</td>
+                            <td style="text-align: center;">91</td>
+                            <td style="text-align: center;">1</td>
+                            <td><small>112 Days</small></td>
+                            <td><small style="color: #999;">Mouser API</small></td>
+                            <td>
+                                <a href="https://www.mouser.com/ProductDetail/989-EP3C16Q240C8N" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <div class="url-preview">https://www.mouser.com/ProductDetail/989-EP3C16Q240C8N</div>
+                            </td>
+                        </tr>
+                        
+                        <!-- OEMSecrets API 示例 -->
+                        <tr>
+                            <td style="text-align: center; color: #999;">2</td>
+                            <td><span class="supplier-badge">Verified Electronics</span></td>
+                            <td><strong>EP3C16Q240C8N</strong></td>
+                            <td>Altera Corporation</td>
+                            <td style="text-align: right;">
+                                <strong>17.38</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">124.35</td>
+                            <td style="text-align: center;">1153</td>
+                            <td style="text-align: center;">0</td>
+                            <td><small>-</small></td>
+                            <td><small style="color: #999;">OEMSecrets API</small></td>
+                            <td>
+                                <a href="https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Altera%20Corporation&q=1153&n=Verified%20Electronics&table=api&media=buynow&source=hk-cff-limited&event_link=https%3A%2F%2Fverifiedelectronics.com%2Fproduct%2Fep3c16q240c8n%2F" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <div class="url-preview">https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Altera%20Corporation&q=1153&n=Verified%20Electronics&table=api&media=buynow&source=hk-cff-limited&event_link=https%3A%2F%2Fverifiedelectronics.com%2Fproduct%2Fep3c16q240c8n%2F</div>
+                            </td>
+                        </tr>
+                        
+                        <!-- 另一个 OEMSecrets 示例 -->
+                        <tr>
+                            <td style="text-align: center; color: #999;">3</td>
+                            <td><span class="supplier-badge">Weyland Electronics</span></td>
+                            <td><strong>EP3C16Q240C8N</strong></td>
+                            <td>Altera Corporation</td>
+                            <td style="text-align: right;">
+                                <strong>26.31</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">188.15</td>
+                            <td style="text-align: center;">576</td>
+                            <td style="text-align: center;">0</td>
+                            <td><small>-</small></td>
+                            <td><small style="color: #999;">OEMSecrets API</small></td>
+                            <td>
+                                <a href="https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Altera%20Corporation&q=576&n=Weyland%20Electronics&table=api&media=buynow&source=hk-cff-limited&event_link=https%3A%2F%2Fwww.weylan-d.com%2Fgoods%2Fdetail%2F589091%2F" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <div class="url-preview">https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Altera%20Corporation&q=576&n=Weyland%20Electronics&table=api&media=buynow&source=hk-cff-limited&event_link=https%3A%2F%2Fwww.weylan-d.com%2Fgoods%2Fdetail%2F589091%2F</div>
+                            </td>
+                        </tr>
+                        
+                        <!-- 您提供的示例 URL -->
+                        <tr class="price-highlight">
+                            <td style="text-align: center; color: #999;">4</td>
+                            <td><span class="supplier-badge">Origin Data Global</span></td>
+                            <td><strong>EP3C16Q240C8N</strong></td>
+                            <td>Intel</td>
+                            <td style="text-align: right;">
+                                <strong>27.66</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">197.82</td>
+                            <td style="text-align: center;">1480</td>
+                            <td style="text-align: center;">0</td>
+                            <td><small>-</small></td>
+                            <td><small style="color: #999;">OEMSecrets API</small></td>
+                            <td>
+                                <a href="https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Intel&q=1480&n=Origin%20Data%20Global&table=api&media=buynow&source=hk-cff-limited&event_link=https%3A%2F%2Fwww.origin-ic.com%2Fproducts%2Fdetail%2FEP3C16Q240C8N%2F7159463%3Futm_source%3Doemsecrets.com%26utm_medium%3DClick%26utm_campaign%3DSearch%2BEngines" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <div class="url-preview">https://analytics.oemsecrets.com/main.php?p=EP3C16Q240C8N&m=Intel&q=1480&n=Origin%20Data%20Global&table=api&media=buynow&source=hk-cffimum&event_link=https%3A%2F%2Fwww.origin-ic.com%2Fproducts%2Fdetail%2FEP3C16Q240C8N%2F7159463%3Futm_source%3Doemsecrets.com%26utm_medium%3DClick%26utm_campaign%3DSearch%2BEngines</div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Qwen AI 示例 -->
+                        <tr>
+                            <td style="text-align: center; color: #999;">5</td>
+                            <td><span class="supplier-badge">LCSC</span></td>
+                            <td><strong>EP3C16Q240C8N</strong></td>
+                            <td>Intel</td>
+                            <td style="text-align: right;">
+                                <strong>45.50</strong>
+                                <small style="color: #999;">USD</small>
+                            </td>
+                            <td style="text-align: right;" class="price-rmb">325.35</td>
+                            <td style="text-align: center;">50</td>
+                            <td style="text-align: center;">10</td>
+                            <td><small>2-4 weeks</small></td>
+                            <td><small style="color: #999;">Qwen AI</small></td>
+                            <td>
+                                <a href="https://www.lcsc.com/product-detail/EP3C16Q240C8N.html" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none;">
+                                    <i class="fas fa-external-link-alt"></i> View
+                                </a>
+                                <div class="url-preview">https://www.lcsc.com/product-detail/EP3C16Q240C8N.html</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 搜索另一个IC按钮 -->
+        <div>
+            <a href="/price/query" class="search-again-button">
+                <i class="fas fa-search"></i> Search Another IC
+            </a>
+        </div>
+        
+        <hr style="margin: 40px 0;">
+        
+        <!-- 列解释详情 -->
+        <div class="legend-box">
+            <h4><i class="fas fa-question-circle"></i> Detailed Column Explanations:</h4>
+            <div class="info-row">
+                <div class="info-item">
+                    <span class="info-label">MOQ (Minimum Order Quantity):</span>
+                    <span class="info-value">The smallest quantity that the supplier will accept for an order. For example, MOQ=10 means you must order at least 10 units. MOQ=0 means there is no minimum order quantity.</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Lead Time:</span>
+                    <span class="info-value">The estimated time between placing an order and receiving the goods. This can vary based on stock availability, shipping method, and supplier location. Common lead times: "In Stock" (immediate), "1-2 weeks", "30 days", etc.</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Search URL:</span>
+                    <span class="info-value">Direct link to the product page on the supplier's website. Click "View" to open the product page in a new tab. This allows you to verify details, check specifications, and place orders directly with the supplier.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 表格行悬停效果
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('best-price') && !this.classList.contains('price-highlight')) {
+                        this.style.backgroundColor = '#f8f9fa';
+                    }
+                });
+                row.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('best-price') && !this.classList.contains('price-highlight')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
+            
+            // 按钮悬停效果
+
+            const buttons = document.querySelectorAll('.download-button, .search-again-button, a[target="_blank"]');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.opacity = '0.8';
+                    this.style.transform = 'translateY(-2px)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // 添加价格排序功能
+
+            const priceCells = document.querySelectorAll('td:nth-child(5)');
+            priceCells.forEach(cell => {
+                const priceText = cell.querySelector('strong').textContent;
+                if (priceText && priceText !== '-') {
+                    const price = parseFloat(priceText);
+                    if (price < 30) {
+                        cell.style.backgroundColor = '#e8f5e9';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
