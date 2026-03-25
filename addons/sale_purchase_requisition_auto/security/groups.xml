@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_purchase_team" model="res.groups">
+        <field name="name">Purchase Team (采购组)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_sales_team" model="res.groups">
+        <field name="name">Sales Team (销售组)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_admin_team" model="res.groups">
+        <field name="name">Admin Team (管理员组)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="purchase_order_sales_rule" model="ir.rule">
+        <field name="name">销售组只能看自己的采购订单</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="groups" eval="[(4, ref('sale_purchase_requisition_auto.group_sales_team'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="purchase_requisition_sales_rule" model="ir.rule">
+        <field name="name">销售组只能看自己的采购需求</field>
+        <field name="model_id" ref="purchase_requisition.model_purchase_requisition"/>
+        <field name="groups" eval="[(4, ref('sale_purchase_requisition_auto.group_sales_team'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="sale_order_purchase_rule" model="ir.rule">
+        <field name="name">采购组只能看自己的销售订单</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="groups" eval="[(4, ref('sale_purchase_requisition_auto.group_purchase_team'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+</odoo>

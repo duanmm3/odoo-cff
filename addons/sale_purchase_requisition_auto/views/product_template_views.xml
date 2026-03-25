@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 产品模板表单视图 - 添加采购负责人字段 -->
+    <record id="product_template_form_inherit_purchase_responsible" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.purchase.responsible</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- 在 general 页面添加采购负责人 -->
+            <xpath expr="//page[@name='general_information']" position="inside">
+                <group name="group_purchase_responsible" string="采购信息">
+                    <field name="purchase_responsible_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 产品模板列表视图 -->
+    <record id="product_template_tree_inherit_purchase_responsible" model="ir.ui.view">
+        <field name="name">product.template.tree.inherit.purchase.responsible</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="responsible_id" position="after">
+                <field name="purchase_responsible_id" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

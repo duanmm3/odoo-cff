@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_create,perm_write,perm_unlink
+access_sale_order_sales_team,sale.order.sales.team,sale.model_sale_order,sale_purchase_requisition_auto.group_sales_team,1,1,1,1
+access_purchase_order_purchase_team,purchase.order.purchase.team,sale_purchase_requisition_auto.group_purchase_team,purchase.model_purchase_order,1,1,1,1
+access_purchase_requisition_purchase_team,purchase.requisition.purchase.team,sale_purchase_requisition_auto.group_purchase_team,purchase_requisition.model_purchase_requisition,1,1,1,1
+access_stock_picking_sales_team,stock.picking.sales.team,sale_purchase_requisition_auto.group_sales_team,stock.model_stock_picking,1,1,1,1
+access_stock_picking_purchase_team,stock.picking.purchase.team,sale_purchase_requisition_auto.group_purchase_team,stock.model_stock_picking,1,1,1,1
+access_account_invoice_sales_team,account.invoice.sales.team,sale_purchase_requisition_auto.group_sales_team,account.model_account_move,1,1,1,1
+access_account_invoice_purchase_team,account.invoice.purchase.team,sale_purchase_requisition_auto.group_purchase_team,account.model_account_move,1,1,1,1

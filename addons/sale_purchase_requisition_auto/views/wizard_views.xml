@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 创建采购订单向导表单 -->
+    <record id="view_sale_order_requisition_wizard_form_v2" model="ir.ui.view">
+        <field name="name">sale.order.requisition.wizard.form</field>
+        <field name="model">sale.order.requisition.wizard</field>
+        <field name="arch" type="xml">
+            <form string="创建采购订单">
+                <header>
+                    <button name="action_create_purchase_order" string="创建采购订单" type="object" class="btn-primary"/>
+                    <button string="取消" special="cancel" class="btn-secondary"/>
+                </header>
+                <group>
+                    <field name="order_id" readonly="True"/>
+                    <field name="product_id" readonly="True"/>
+                </group>
+                <group>
+                    <field name="ordered_qty" readonly="True"/>
+                    <field name="available_qty" readonly="True"/>
+                    <field name="missing_qty" readonly="True"/>
+                    <field name="qty_type"/>
+                </group>
+                <group>
+                    <field name="send_notification"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- 向导列表视图 -->
+    <record id="view_sale_order_requisition_wizard_list" model="ir.ui.view">
+        <field name="name">sale.order.requisition.wizard.list</field>
+        <field name="model">sale.order.requisition.wizard</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <field name="product_id"/>
+                <field name="ordered_qty"/>
+                <field name="available_qty"/>
+                <field name="missing_qty"/>
+                <field name="qty_type"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 向导操作 -->
+    <record id="action_sale_order_requisition_wizard" model="ir.actions.act_window">
+        <field name="name">创建采购订单</field>
+        <field name="res_model">sale.order.requisition.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

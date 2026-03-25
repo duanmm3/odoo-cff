@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 销售订单表单视图 - 添加创建采购订单按钮 -->
+    <record id="sale_order_form_inherit_requisition" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.requisition</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="before">
+                <button class="btn-secondary" name="action_create_requisition"
+                        string="创建采购订单" type="object"
+                        groups="sales_team.group_sale_salesman"
+                        invisible="state in ('done', 'cancel')"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
