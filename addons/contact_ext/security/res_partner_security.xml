@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 权限控制在 Python 代码中实现 -->
+</odoo>

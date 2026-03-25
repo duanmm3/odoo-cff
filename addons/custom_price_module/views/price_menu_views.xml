@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Actions for web pages -->
+    <record id="action_price_web_query" model="ir.actions.act_url">
+        <field name="name">价格查询</field>
+        <field name="url">/price/query</field>
+        <field name="target">self</field>
+    </record>
+    
+    <record id="action_price_web_config" model="ir.actions.act_url">
+        <field name="name">配置</field>
+        <field name="url">/price/config</field>
+        <field name="target">self</field>
+    </record>
+    
+    <!-- Main menu for Price Module -->
+    <menuitem id="menu_price_root" name="价格查询" sequence="10"/>
+    
+    <!-- Web Query Menu -->
+    <menuitem id="menu_price_web" name="网页查询" parent="menu_price_root" sequence="10"/>
+    <menuitem id="menu_price_web_query" name="查询价格" parent="menu_price_web" action="action_price_web_query" sequence="10"/>
+    <menuitem id="menu_price_web_config" name="系统配置" parent="menu_price_web" action="action_price_web_config" sequence="20"/>
+    
+    <!-- Database Query Menu -->
+    <menuitem id="menu_price_db" name="数据库查询" parent="menu_price_root" sequence="20"/>
+    <menuitem id="menu_price_db_all" name="所有查询" parent="menu_price_db" action="action_price_query" sequence="10"/>
+    
+</odoo>

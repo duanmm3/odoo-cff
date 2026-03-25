@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 采购订单列表视图扩展 -->
+    <record id="view_purchase_order_approval_tree" model="ir.ui.view">
+        <field name="name">purchase.order.approval.tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" optional="show" widget="badge" decoration-success="approval_state=='approved'" decoration-warning="approval_state=='pending'" decoration-danger="approval_state=='rejected'"/>
+                <field name="need_approval" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 采购订单表单视图扩展 -->
+    <record id="view_purchase_order_approval_form" model="ir.ui.view">
+        <field name="name">purchase.order.approval.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- 添加审批状态按钮到header -->
+            <xpath expr="//header/button[@name='action_confirm']" position="before">
+                <button name="action_submit_approval" string="提交审批" type="object" 
+                    invisible="need_approval == False or approval_state != 'no'" 
+                    class="oe_highlight" data-hotkey="a"/>
+                <button name="action_view_approval" string="查看审批" type="object" 
+                    invisible="approval_state == 'no'" 
+                    class="oe_highlight" data-hotkey="v"/>
+            </xpath>
+            
+            <!-- 审批状态显示 -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" widget="badge" decoration-success="approval_state=='approved'" decoration-warning="approval_state=='pending'" decoration-danger="approval_state=='rejected'" readonly="1"/>
+            </xpath>
+            
+            <!-- 添加审批信息到页面 -->
+            <xpath expr="//field[@name='partner_id']/ancestor::group[1]" position="inside">
+                <field name="need_approval" invisible="1"/>
+                <field name="approval_user_id" invisible="approval_state == 'no'"/>
+                <field name="approval_date" invisible="approval_state == 'no'"/>
+                <field name="approval_request_id" invisible="approval_state == 'no'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

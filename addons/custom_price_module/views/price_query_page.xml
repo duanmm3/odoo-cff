@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="price_query_page" name="Price Query Page">
+        <!-- 添加Font Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <div style="background-color: #f5f5f5; min-height: 100vh; padding: 50px 0;">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="text-align: left; margin-bottom: 15px;">
+                        <a href="/odoo" style="color: #337ab7; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                            <span style="font-family: FontAwesome;">&#xf015;</span> Back to Home
+                        </a>
+                    </div>
+                    <h2 style="color: #337ab7;">
+                        <span style="font-family: FontAwesome;">&#xf2db;</span> IC Price Query System
+                    </h2>
+                    <p style="color: #777;">Search electronic component prices from multiple suppliers</p>
+                </div>
+                
+                <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px;">
+                    <form action="/zh_CN/price/query/submit" method="post" onsubmit="showLoading()">
+                        <div style="display: flex; gap: 15px;">
+                            <div style="flex: 2;">
+                                <input type="text" 
+                                       name="ic_model" 
+                                       id="ic_model_input"
+                                       style="width: 100%; padding: 15px; font-size: 16px; border: 1px solid #ddd; border-radius: 5px;" 
+                                       placeholder="Enter IC Model (e.g., STM32F103C8T6)" 
+                                       required="required"/>
+                            </div>
+                            <div style="flex: 1;">
+                                <button type="submit" id="query_btn" style="width: 100%; padding: 15px 25px; font-size: 16px; background: #337ab7; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                    <span style="font-family: FontAwesome;">&#xf002;</span> Query Price
+                                </button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <label style="color: #777;">
+                                <input type="checkbox" name="refresh" value="true"/> Force refresh (skip cache)
+                            </label>
+                        </div>
+                    </form>
+                    
+                    <div id="loading_msg" style="display: none; text-align: center; margin-top: 30px; padding: 20px;">
+                        <div style="font-size: 24px; color: #337ab7;">
+                            <span style="font-family: FontAwesome; font-size: 30px;">&#xf110;</span> Loading...
+                        </div>
+                        <p style="color: #777; margin-top: 10px;">
+                            Querying multiple suppliers (Mouser, OEMSecrets, Nexar, LCSC, Qwen AI)...<br/>
+                            This may take 30-60 seconds, please wait...
+                        </p>
+                    </div>
+                </div>
+                
+                <t t-if="error">
+                    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                        <t t-esc="error"/>
+                    </div>
+                </t>
+                
+                <div style="text-align: center; margin-top: 20px; color: #777;">
+                    <small>Supported: Mouser, LCSC, OEMSecrets, Nexar, Qwen AI</small>
+                </div>
+            </div>
+            
+            <script>
+                function showLoading() {
+                    var btn = document.getElementById('query_btn');
+                    var loading = document.getElementById('loading_msg');
+                    var input = document.getElementById('ic_model_input');
+                    if (input.value.trim() !== '') {
+                        btn.disabled = true;
+                        btn.innerHTML = '<span style="font-family: FontAwesome;">&#xf110;</span> Querying...';
+                        loading.style.display = 'block';
+                        document.body.style.cursor = 'wait';
+                    }
+                }
+            </script>
+        </div>
+    </template>
+    
+    <template id="price_result_page" name="Price Result Page">
+        <!-- 添加Font Awesome CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <div style="background-color: #f5f5f5; min-height: 100vh; padding: 50px 0;">
+            <div style="max-width: 1200px; margin: 0 auto;">
+                <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div>
+                            <!-- 智能返回链接：根据当前URL判断是中文还是英文页面 -->
+                            <a href="/odoo" style="color: #337ab7; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                                <span style="font-family: FontAwesome;">&#xf015;</span> Home
+                            </a>
+                            <t t-set="is_zh" t-value="request.httprequest.path.startswith('/zh_CN')"/>
+                            <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="color: #337ab7; text-decoration: none; margin-right: 15px;">
+                                <span style="font-family: FontAwesome;">&#xf053;</span> Back
+                            </a>
+                            <a t-attf-href="/price/query" t-if="not is_zh" style="color: #337ab7; text-decoration: none; margin-right: 15px;">
+                                <span style="font-family: FontAwesome;">&#xf053;</span> Back
+                            </a>                            
+                            <h2 style="display: inline;"><strong><t t-esc="ic_model"/></strong> Price Results</h2>
+                        </div>
+                        <div>
+                            <!-- 智能下载链接 -->
+                            <a t-attf-href="/zh_CN/price/download/csv/{{ ic_model }}" t-if="is_zh" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+                                <span style="font-family: FontAwesome;">&#xf019;</span> Download CSV
+                            </a>
+                            <a t-attf-href="/price/download/csv/{{ ic_model }}" t-if="not is_zh" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
+                                <span style="font-family: FontAwesome;">&#xf019;</span> Download CSV
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 精简的状态信息 -->
+                    <div style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px;">
+                        <strong>Found <t t-esc="count"/> quotes</strong> - Query Time: <t t-esc="query_time"/>
+                    </div>
+                </div>
+                
+                <t t-if="count > 0">
+                    <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead style="background: #343a40; color: white;">
+                                    <tr>
+                                        <th style="padding: 12px; text-align: center;">#</th>
+                                        <th style="padding: 12px; text-align: left;">Supplier</th>
+                                        <th style="padding: 12px; text-align: left;">Part Number</th>
+                                        <th style="padding: 12px; text-align: left;">Manufacturer</th>
+                                        <th style="padding: 12px; text-align: right;">Price</th>
+                                        <th style="padding: 12px; text-align: right;">RMB</th>
+                                        <th style="padding: 12px; text-align: center;">Stock</th>
+                                        <th style="padding: 12px; text-align: center;" title="Minimum Order Quantity (最小订购量)">MOQ</th>
+                                        <th style="padding: 12px; text-align: left;" title="Estimated delivery time (交货期)">Lead Time</th>
+                                        <th style="padding: 12px; text-align: left;">Source</th>
+                                        <th style="padding: 12px; text-align: left;">Search URL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="idx" t-value="1"/>
+                                    <tr t-foreach="quotes" t-as="quote" t-att-style="'border-bottom: 1px solid #eee; background-color: ' + (idx &lt;= 5 and '#e8f5e8' or 'transparent')">
+                                        <td style="padding: 12px; text-align: center; color: #999;"><t t-esc="idx"/><t t-set="idx" t-value="idx+1"/></td>
+                                        <td style="padding: 12px;">
+                                            <span style="background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px;">
+                                                <t t-esc="quote.get('supplier', '')"/>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 12px;"><strong><t t-esc="quote.get('part_number', '')"/></strong></td>
+                                        <td style="padding: 12px;"><t t-esc="quote.get('manufacturer', '-')"/></td>
+                                        <td style="padding: 12px; text-align: right;">
+                                            <strong><t t-esc="quote.get('price', '-')"/></strong>
+                                            <small style="color: #999;"><t t-esc="quote.get('currency', '')"/></small>
+                                        </td>
+                                        <td style="padding: 12px; text-align: right; color: #dc3545; font-weight: bold;">
+                                            <t t-esc="'%.2f' % quote.get('rmb', 0)"/>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center;"><t t-esc="quote.get('stock', '-')"/></td>
+                                        <td style="padding: 12px; text-align: center;" title="Minimum Order Quantity"><t t-esc="quote.get('moq', '-')"/></td>
+                                        <td style="padding: 12px;" title="Estimated delivery time"><small><t t-esc="quote.get('lead_time', '-')"/></small></td>
+                                        <td style="padding: 12px;"><small style="color: #999;"><t t-esc="quote.get('source', '-')"/></small></td>
+                                        <td style="padding: 12px;">
+                                            <t t-if="quote.get('link')">
+                                                <a t-att-href="quote.get('link')" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none; word-break: break-all; max-width: 200px; display: inline-block;">
+                                                    <i class="fa fa-external-link-alt"></i> View
+                                                </a>
+                                            </t>
+                                            <t t-else="">
+                                                <span style="color: #999; font-size: 12px;">-</span>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 列解释 -->
+                    <div style="background: #e7f3ff; color: #004085; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 13px; border-left: 4px solid #007bff;">
+                        <div style="font-weight: bold; color: #007bff; margin-bottom: 8px;">
+                            <i class="fas fa-info-circle"></i> Column Explanations:
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                            <div>
+                                <span style="font-weight: bold;">MOQ:</span>
+                                <span>Minimum Order Quantity (最小订购量)</span>
+                            </div>
+                            <div>
+                                <span style="font-weight: bold;">Lead Time:</span>
+                                <span>Estimated delivery time (交货期)</span>
+                            </div>
+                            <div>
+                                <span style="font-weight: bold;">Search URL:</span>
+                                <span>Direct link to product page (产品页面链接)</span>
+                            </div>
+                            <div>
+                                <span style="font-weight: bold;">Top 5 (Green):</span>
+                                <span>Lowest 5 prices highlighted in light green (最低5个价格用浅绿色高亮)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">
+                            <span style="font-family: FontAwesome;">&#xf002;</span> Search Another IC
+                        </a>
+                        <a t-attf-href="/price/query" t-if="not is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">
+                            <span style="font-family: FontAwesome;">&#xf002;</span> Search Another IC
+                        </a>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div style="background: #fff3cd; color: #856404; padding: 30px; border-radius: 10px; text-align: center;">
+                        <h4><span style="font-family: FontAwesome;">&#xf071;</span> No quotes found</h4>
+                        <p>No price quotes were found for <strong><t t-esc="ic_model"/></strong>.</p>
+                        <p style="margin-top: 20px;">
+                            <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">Try Another IC Model</a>
+                            <a t-attf-href="/price/query" t-if="not is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">Try Another IC Model</a>
+                        </p>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </template>
+    
+    <template id="config_page" name="Configuration Page">
+        <div style="background-color: #f5f5f5; min-height: 100vh; padding: 50px 0;">
+            <div style="max-width: 600px; margin: 0 auto;">
+                <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px;">
+                    <div style="margin-bottom: 20px;">
+                        <a href="/zh_CN/price/query" style="color: #337ab7; text-decoration: none;">
+                            <span style="font-family: FontAwesome;">&#xf053;</span> Back
+                        </a> 
+                        <h2 style="display: inline; margin-left: 10px;">System Configuration</h2>
+                    </div>
+                    
+                    <t t-if="success">
+                        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                            <t t-esc="success"/>
+                        </div>
+                    </t>
+                    
+                    <form action="/zh_CN/price/config/save" method="post">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Mouser API Key</label>
+                            <input type="password" name="mouser_api_key" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" t-att-value="config.mouser_api_key"/>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nexar Client ID</label>
+                            <input type="text" name="nexar_client_id" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" t-att-value="config.nexar_client_id"/>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nexar Client Secret</label>
+                            <input type="password" name="nexar_client_secret" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" t-att-value="config.nexar_client_secret"/>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">OEMSecrets API Key</label>
+                            <input type="password" name="oemsecrets_api_key" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" t-att-value="config.oemsecrets_api_key"/>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Qwen API Key</label>
+                            <input type="password" name="qwen_api_key" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" t-att-value="config.qwen_api_key"/>
+                        </div>
+                        
+                        <div style="text-align: right; margin-top: 20px;">
+                            <button type="submit" style="padding: 12px 30px; background: #337ab7; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Save Configuration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+</odoo>
