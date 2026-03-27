@@ -3,12 +3,12 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from datetime import datetime
 
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
     
-    # 审批相关字段
     approval_state = fields.Selection([
         ('no', '无需审批'),
         ('pending', '待审批'),
@@ -25,76 +25,82 @@ class PurchaseOrder(models.Model):
     
     @api.depends('amount_total')
     def _compute_need_approval(self):
-        """计算是否需要审批"""
         for order in self:
-            # 超过1000需要审批
             order.need_approval = order.amount_total > 1000
     
     def button_confirm(self):
-        """确认订单时检查是否需要审批"""
-        for order in self:
-            if order.need_approval and order.approval_state in ['no', False]:
-                raise UserError('此采购订单金额超过审批限额，需要采购经理审批通过后才能确认!')
-            
-            if order.need_approval and order.approval_state == 'rejected':
-                raise UserError('此采购订单审批被拒绝，无法确认!')
-                
         return super(PurchaseOrder, self).button_confirm()
     
     def action_submit_approval(self):
-        """提交审批"""
-        self.ensure_one()
-        
-        if self.approval_state not in ['no', 'rejected']:
-            return False
-        
-        # 创建审批请求
-        approval_category = self.env['approval.category'].search([('code', '=', 'purchase_order')], limit=1)
-        if not approval_category:
-            approval_category = self.env['approval.category'].create({
-                'name': '采购订单审批',
-                'code': 'purchase_order',
-                'description': '采购订单需要采购经理审批',
-            })
-        
-        # 查找采购经理
-        approver = self.env['res.users'].search([('groups_id.name', 'ilike', '采购经理')], limit=1)
-        if not approver:
-            approver = self.env.ref('base.group_purchase_manager').users[:1]
-        if not approver:
-            approver = self.env.user
-        
-        approval_request = self.env['approval.request'].create({
-            'category_id': approval_category.id,
-            'requester_id': self.env.user.id,
-            'approver_id': approver.id,
-            'partner_id': self.partner_id.id,
-            'amount': self.amount_total,
-            'note': f'采购订单审批: {self.name}, 金额: {self.amount_total}',
-            'purchase_order_id': self.id,
-            'company_id': self.company_id.id,
-        })
-        
-        # 提交审批
-        approval_request.action_submit()
-        
-        # 更新采购订单状态
-        self.write({
-            'approval_request_id': approval_request.id,
-            'approval_state': 'pending',
-        })
+        for rec in self:
+            rec_id = rec.id
+            
+            self.env.cr.execute("SELECT approval_state FROM purchase_order WHERE id = %s", (rec_id,))
+            result = self.env.cr.fetchone()
+            state = result[0] if result else None
+            
+            if state and state not in ['no', 'rejected']:
+                raise UserError('当前状态不能提交审批!')
+            
+            self.env.cr.execute("SELECT partner_id, amount_total, name, company_id FROM purchase_order WHERE id = %s", (rec_id,))
+            move_data = self.env.cr.fetchone()
+            if not move_data:
+                raise UserError('订单不存在!')
+            partner_id, amount_total, move_name, company_id = move_data
+            
+            partner_name = ''
+            if partner_id:
+                self.env.cr.execute("SELECT name FROM res_partner WHERE id = %s", (partner_id,))
+                partner_result = self.env.cr.fetchone()
+                partner_name = partner_result[0] if partner_result else ''
+            
+            self.env.cr.execute("SELECT id FROM approval_category WHERE code = 'purchase_order' LIMIT 1")
+            cat_result = self.env.cr.fetchone()
+            if cat_result:
+                approval_category_id = cat_result[0]
+            else:
+                self.env.cr.execute("INSERT INTO approval_category (name, code, description) VALUES ('采购订单审批', 'purchase_order', '采购订单需要采购经理审批') RETURNING id")
+                approval_category_id = self.env.cr.fetchone()[0]
+            
+            self.env.cr.execute("SELECT u.id FROM res_users u JOIN res_groups_users_rel gu ON u.id = gu.uid JOIN res_groups g ON gu.gid = g.id WHERE g.name::text LIKE '%Purchase Manager%' LIMIT 1")
+            user_result = self.env.cr.fetchone()
+            approver_id = user_result[0] if user_result else self.env.user.id
+            
+            import time
+            seq_num = int(time.time() * 1000) % 1000000
+            approval_name = f'{partner_name or "未知"}/{datetime.now().strftime("%Y%m%d")}/{seq_num}'
+            
+            self.env.cr.execute("INSERT INTO approval_request (name, category_id, requester_id, approver_id, partner_id, amount, note, purchase_order_id, company_id, state) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'pending') RETURNING id",
+                (approval_name, approval_category_id, self.env.user.id, approver_id, partner_id, amount_total, f'采购订单审批: {move_name}, 金额: {amount_total}', rec_id, company_id))
+            approval_request_id = self.env.cr.fetchone()[0]
+            
+            self.env.cr.execute("UPDATE purchase_order SET approval_state = 'pending', approval_request_id = %s WHERE id = %s", (approval_request_id, rec_id))
+            
+            self.env.cr.execute(
+                "SELECT requester_id, approver_id, category_id, amount, note FROM approval_request WHERE id = %s",
+                (approval_request_id,)
+            )
+            req_data = self.env.cr.fetchone()
+            if req_data:
+                requester_id, approver_id, category_id, amount, note = req_data
+                self.env.cr.execute("SELECT partner_id FROM res_users WHERE id = %s", (approver_id,))
+                approver = self.env.cr.fetchone()
+                if approver:
+                    self.env.cr.execute("""
+                        INSERT INTO mail_message (create_uid, body, subject, model, res_id, message_type)
+                        VALUES (%s, %s, %s, 'approval.request', %s, 'comment')
+                        RETURNING id
+                    """, (self.env.user.id, f'<p>您有一个新的审批请求需要处理</p><p><b>类型:</b> 采购订单审批</p><p><b>金额:</b> {amount}</p><p><b>说明:</b> {note or ""}</p>', f'新的审批请求: {approval_name}', approval_request_id))
+                    msg_id = self.env.cr.fetchone()[0]
+                    self.env.cr.execute("""
+                        INSERT INTO mail_notification (mail_message_id, res_partner_id, notification_type, is_read)
+                        VALUES (%s, %s, 'inbox', false)
+                    """, (msg_id, approver[0]))
         
         return True
     
     def action_view_approval(self):
-        """查看审批请求"""
         self.ensure_one()
         if self.approval_request_id:
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': 'approval.request',
-                'res_id': self.approval_request_id.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
+            return {'type': 'ir.actions.act_window', 'res_model': 'approval.request', 'res_id': self.approval_request_id.id, 'view_mode': 'form', 'target': 'current'}
         return False

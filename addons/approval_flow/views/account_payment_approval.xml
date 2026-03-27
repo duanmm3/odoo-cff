@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 付款列表视图扩展 -->
+    <record id="view_account_payment_approval_tree" model="ir.ui.view">
+        <field name="name">account.payment.approval.tree</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" optional="show" widget="badge" decoration-success="approval_state=='approved'" decoration-warning="approval_state=='pending'" decoration-danger="approval_state=='rejected'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 付款表单视图扩展 -->
+    <record id="view_account_payment_approval_form" model="ir.ui.view">
+        <field name="name">account.payment.approval.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <!-- 审批状态显示 -->
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="approval_state" widget="badge" decoration-success="approval_state=='approved'" decoration-warning="approval_state=='pending'" decoration-danger="approval_state=='rejected'" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

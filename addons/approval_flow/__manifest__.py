@@ -29,8 +29,9 @@
         'security/ir.model.access.csv',
         'views/approval_request_views.xml',
         'views/sale_order_approval.xml',
-        # 'views/purchase_order_approval.xml',  # 暂时注释，先让模块安装成功
+        # 'views/purchase_order_approval.xml',
         'views/account_move_approval.xml',
+        'views/account_payment_approval.xml',
     ],
     'demo': [],
     'installable': True,

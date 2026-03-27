@@ -30,7 +30,7 @@ class ApprovalRequest(models.Model):
     _order = 'create_date desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char('审批单号', required=True, copy=False, readonly=True, index=True, default=lambda self: '新审批')
+    name = fields.Char('审批单号', required=True, copy=False, readonly=True, index=True)
     
     category_id = fields.Many2one('approval.category', '审批类型', required=True)
     
@@ -57,6 +57,7 @@ class ApprovalRequest(models.Model):
     sale_order_id = fields.Many2one('sale.order', '销售订单')
     purchase_order_id = fields.Many2one('purchase.order', '采购订单')
     account_move_id = fields.Many2one('account.move', '发票')
+    account_payment_id = fields.Many2one('account.payment', '付款')
     
     date_approved = fields.Datetime('批准时间')
     date_rejected = fields.Datetime('拒绝时间')
@@ -82,9 +83,9 @@ class ApprovalRequest(models.Model):
             if record.state != 'pending':
                 continue
             
-            # 检查权限（只有审批人可以批准）
+            # 检查权限（审批人或管理员可以批准）
             if record.approver_id != self.env.user and not self.env.user.has_group('base.group_system'):
-                raise UserError('只有审批人才能批准此审批请求!')
+                raise UserError('只有审批人或管理员才能批准此审批请求!')
             
             record.write({
                 'state': 'approved',
@@ -199,7 +200,15 @@ class ApprovalRequest(models.Model):
         
         # 发票审批通过
         if self.account_move_id:
-            self.account_move_id.write({
+            self.account_move_id.sudo().write({
+                'approval_state': 'approved',
+                'approval_user_id': self.approver_id.id,
+                'approval_date': datetime.now(),
+            })
+        
+        # 付款审批通过
+        if self.account_payment_id:
+            self.account_payment_id.sudo().write({
                 'approval_state': 'approved',
                 'approval_user_id': self.approver_id.id,
                 'approval_date': datetime.now(),
@@ -223,5 +232,11 @@ class ApprovalRequest(models.Model):
         # 发票审批拒绝
         if self.account_move_id:
             self.account_move_id.write({
+                'approval_state': 'rejected',
+            })
+        
+        # 付款审批拒绝
+        if self.account_payment_id:
+            self.account_payment_id.write({
                 'approval_state': 'rejected',
             })

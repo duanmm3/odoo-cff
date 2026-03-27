@@ -5,14 +5,15 @@
         <field name="name">approval.request.list</field>
         <field name="model">approval.request</field>
         <field name="arch" type="xml">
-            <list string="审批请求" decoration-success="state=='approved'" decoration-danger="state=='rejected'" decoration-warning="state=='pending'">
+            <list string="审批请求" decoration-success="state=='approved'" decoration-danger="state=='rejected'" decoration-warning="state=='pending'" sample="1">
                 <field name="name"/>
                 <field name="category_id"/>
                 <field name="requester_id"/>
                 <field name="approver_id"/>
-                <field name="amount"/>
-                <field name="state"/>
-                <field name="create_date"/>
+                <field name="amount" widget="monetary"/>
+                <field name="state" widget="badge" decoration-success="state=='approved'" decoration-danger="state=='rejected'" decoration-warning="state=='pending'"/>
+                <button name="action_approve" string="✓ 通过" type="object" class="btn-success" invisible="state != 'pending'" title="通过"/>
+                <button name="action_reject" string="✗ 拒绝" type="object" class="btn-danger" invisible="state != 'pending'" title="拒绝"/>
             </list>
         </field>
     </record>
@@ -24,38 +25,39 @@
         <field name="arch" type="xml">
             <form string="审批请求">
                 <header>
-                    <button name="action_submit" string="提交审批" type="object" invisible="state != 'draft'" class="oe_highlight"/>
-                    <button name="action_approve" string="批准" type="object" invisible="state != 'pending'" class="oe_highlight" context="{'reject': False}"/>
-                    <button name="action_reject" string="拒绝" type="object" invisible="state != 'pending'" class="oe_highlight" context="{'reject': True}"/>
-                    <button name="action_draft" string="撤回" type="object" invisible="state not in ['rejected', 'approved']"/>
+                    <button name="action_approve" string="✓ 通过" type="object" invisible="state != 'pending'" class="oe_highlight o_btn Approve" style="background-color: #28a745; color: white; font-weight: bold;"/>
+                    <button name="action_reject" string="✗ 拒绝" type="object" invisible="state != 'pending'" class="oe_highlight o_btn_reject" style="background-color: #dc3545; color: white; font-weight: bold;"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,pending,approved,rejected"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name" readonly="1"/>
-                            <field name="category_id" readonly="state != 'draft'"/>
+                            <field name="name" readonly="1" options="{'font': {'weight': 'bold'}}" style="font-size: 16px;"/>
+                            <field name="category_id" readonly="state != 'draft'" options="{'bg_color': '#e8f4f8'}"/>
                             <field name="requester_id" readonly="state != 'draft'"/>
                             <field name="approver_id" readonly="state != 'draft'"/>
+                            <field name="amount" widget="monetary" options="{'currency_field': 'company_id'}" readonly="state != 'draft'" style="font-size: 18px; font-weight: bold; color: #007bff;"/>
                         </group>
                         <group>
-                            <field name="partner_id"/>
-                            <field name="amount"/>
+                            <field name="partner_id" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
-                    <group string="关联单据">
-                        <field name="sale_order_id" readonly="1"/>
-                        <field name="purchase_order_id" readonly="1"/>
-                        <field name="account_move_id" readonly="1"/>
+                    <group string="关联单据" col="4">
+                        <field name="sale_order_id" readonly="1" options="{'bg_color': '#f8f9fa'}"/>
+                        <field name="purchase_order_id" readonly="1" options="{'bg_color': '#f8f9fa'}"/>
+                        <field name="account_move_id" readonly="1" options="{'bg_color': '#f8f9fa'}"/>
+                        <field name="account_payment_id" readonly="1" options="{'bg_color': '#f8f9fa'}"/>
                     </group>
-                    <group string="审批信息">
-                        <field name="note" placeholder="请输入申请说明..."/>
-                        <field name="reject_reason" readonly="state != 'rejected'"/>
+                    <group string="申请说明">
+                        <field name="note" readonly="state != 'draft'" placeholder="请输入申请说明..." options="{'autosize': true}"/>
                     </group>
-                    <group string="审批时间">
-                        <field name="date_approved" readonly="1"/>
-                        <field name="date_rejected" readonly="1"/>
+                    <group string="拒绝原因" invisible="state != 'rejected'">
+                        <field name="reject_reason" readonly="1" options="{'bg_color': '#fff3cd'}"/>
+                    </group>
+                    <group string="审批结果" col="2">
+                        <field name="date_approved" readonly="1" invisible="state != 'approved'" options="{'bg_color': '#d4edda'}"/>
+                        <field name="date_rejected" readonly="1" invisible="state != 'rejected'" options="{'bg_color': '#f8d7da'}"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
