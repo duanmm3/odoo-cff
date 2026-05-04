@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ai_report_audit" model="ir.actions.act_window">
+        <field name="name">审计日志</field>
+        <field name="res_model">ai.report.audit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_ai_report_audit_tree" model="ir.ui.view">
+        <field name="name">ai.report.audit.tree</field>
+        <field name="model">ai.report.audit</field>
+        <field name="arch" type="xml">
+            <list string="审计日志" decoration-success="status=='success'" decoration-danger="status=='failed'">
+                <field name="create_date" string="时间"/>
+                <field name="user_id" string="用户"/>
+                <field name="user_role" string="角色"/>
+                <field name="action_type" string="操作类型"/>
+                <field name="question" string="问题"/>
+                <field name="status" string="状态"/>
+                <field name="execution_time" string="耗时"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ai_report_audit_form" model="ir.ui.view">
+        <field name="name">ai.report.audit.form</field>
+        <field name="model">ai.report.audit</field>
+        <field name="arch" type="xml">
+            <form string="审计详情">
+                <sheet>
+                    <group>
+                        <field name="user_id"/>
+                        <field name="user_role"/>
+                        <field name="action_type"/>
+                        <field name="question"/>
+                        <field name="generated_sql"/>
+                        <field name="result_summary"/>
+                        <field name="status"/>
+                        <field name="error_message"/>
+                        <field name="execution_time"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+relationships:
+  - name: sale_order_to_partner
+    models: [sale_order, res_partner]
+    join_type: MANY_TO_ONE
+    condition: sale_order.partner_id = res_partner.id
+  - name: sale_order_line_to_order
+    models: [sale_order_line, sale_order]
+    join_type: MANY_TO_ONE
+    condition: sale_order_line.order_id = sale_order.id
+  - name: sale_order_line_to_product
+    models: [sale_order_line, product_product]
+    join_type: MANY_TO_ONE
+    condition: sale_order_line.product_id = product_product.id
+  - name: purchase_order_to_partner
+    models: [purchase_order, res_partner]
+    join_type: MANY_TO_ONE
+    condition: purchase_order.partner_id = res_partner.id
+  - name: purchase_order_line_to_order
+    models: [purchase_order_line, purchase_order]
+    join_type: MANY_TO_ONE
+    condition: purchase_order_line.order_id = purchase_order.id
+  - name: purchase_order_line_to_product
+    models: [purchase_order_line, product_product]
+    join_type: MANY_TO_ONE
+    condition: purchase_order_line.product_id = product_product.id
+  - name: stock_move_to_product
+    models: [stock_move, product_product]
+    join_type: MANY_TO_ONE
+    condition: stock_move.product_id = product_product.id

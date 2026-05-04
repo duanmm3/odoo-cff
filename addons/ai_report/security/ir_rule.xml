@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="audit_rule_user" model="ir.rule">
+        <field name="name">Audit: User sees own records</field>
+        <field name="model_id" ref="model_ai_report_audit"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('ai_report.group_ai_report_user'))]"/>
+    </record>
+
+    <record id="audit_rule_manager" model="ir.rule">
+        <field name="name">Audit: Manager sees all</field>
+        <field name="model_id" ref="model_ai_report_audit"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('ai_report.group_ai_report_manager'))]"/>
+    </record>
+</odoo>

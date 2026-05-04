@@ -1,0 +1,34 @@
+name: stock_move
+table_reference:
+  catalog: ""
+  schema: public
+  table: stock_move
+columns:
+  - name: id
+    type: INTEGER
+    is_primary_key: true
+  - name: name
+    type: VARCHAR
+    description: "移动描述"
+  - name: product_id
+    type: INTEGER
+    description: "产品ID"
+  - name: product_uom_qty
+    type: DECIMAL
+    description: "需求数量"
+  - name: quantity_done
+    type: DECIMAL
+    description: "已完成数量"
+  - name: location_id
+    type: INTEGER
+    description: "源库位ID"
+  - name: location_dest_id
+    type: INTEGER
+    description: "目标库位ID"
+  - name: state
+    type: VARCHAR
+    description: "状态"
+primary_key: id
+properties:
+  description: "库存移动记录"
+  module: warehouse

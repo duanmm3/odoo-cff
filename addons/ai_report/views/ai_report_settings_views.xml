@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ai_report_settings" model="ir.actions.act_window">
+        <field name="name">AI Report 设置</field>
+        <field name="res_model">ai.report.settings</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <record id="view_ai_report_settings_form" model="ir.ui.view">
+        <field name="name">ai.report.settings.form</field>
+        <field name="model">ai.report.settings</field>
+        <field name="arch" type="xml">
+            <form string="AI Report 全局设置">
+                <sheet>
+                    <group string="LLM配置">
+                        <field name="llm_api_base"/>
+                        <field name="llm_model"/>
+                    </group>
+                    <group string="查询设置">
+                        <field name="max_query_rows"/>
+                        <field name="query_timeout"/>
+                    </group>
+                    <group string="DML操作">
+                        <field name="enable_dml"/>
+                        <field name="dml_require_approval"/>
+                        <field name="approval_threshold_amount"/>
+                    </group>
+                    <group string="角色权限">
+                        <field name="sales_can_query"/>
+                        <field name="sales_can_create"/>
+                        <field name="purchase_can_query"/>
+                        <field name="purchase_can_create"/>
+                        <field name="warehouse_can_query"/>
+                        <field name="warehouse_can_stock_in"/>
+                        <field name="warehouse_can_stock_out"/>
+                    </group>
+                    <group string="行级安全">
+                        <field name="enable_row_level_security"/>
+                        <field name="sales_see_own_only"/>
+                        <field name="purchase_see_own_only"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

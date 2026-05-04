@@ -1,0 +1,25 @@
+name: purchase_order_line
+table_reference:
+  catalog: ""
+  schema: public
+  table: purchase_order_line
+columns:
+  - name: id
+    type: INTEGER
+    is_primary_key: true
+  - name: order_id
+    type: INTEGER
+    description: "订单ID"
+  - name: product_id
+    type: INTEGER
+    description: "产品ID"
+  - name: product_qty
+    type: DECIMAL
+    description: "数量"
+  - name: price_unit
+    type: DECIMAL
+    description: "单价"
+primary_key: id
+properties:
+  description: "采购订单明细"
+  module: purchase

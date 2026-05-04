@@ -82,43 +82,66 @@
     <template id="price_result_page" name="Price Result Page">
         <!-- 添加Font Awesome CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <div style="background-color: #f5f5f5; min-height: 100vh; padding: 50px 0;">
-            <div style="max-width: 1200px; margin: 0 auto;">
-                <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div>
-                            <!-- 智能返回链接：根据当前URL判断是中文还是英文页面 -->
-                            <a href="/odoo" style="color: #337ab7; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
-                                <span style="font-family: FontAwesome;">&#xf015;</span> Home
-                            </a>
-                            <t t-set="is_zh" t-value="request.httprequest.path.startswith('/zh_CN')"/>
-                            <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="color: #337ab7; text-decoration: none; margin-right: 15px;">
-                                <span style="font-family: FontAwesome;">&#xf053;</span> Back
-                            </a>
-                            <a t-attf-href="/price/query" t-if="not is_zh" style="color: #337ab7; text-decoration: none; margin-right: 15px;">
-                                <span style="font-family: FontAwesome;">&#xf053;</span> Back
-                            </a>                            
-                            <h2 style="display: inline;"><strong><t t-esc="ic_model"/></strong> Price Results</h2>
-                        </div>
-                        <div>
-                            <!-- 智能下载链接 -->
-                            <a t-attf-href="/zh_CN/price/download/csv/{{ ic_model }}" t-if="is_zh" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
-                                <span style="font-family: FontAwesome;">&#xf019;</span> Download CSV
-                            </a>
-                            <a t-attf-href="/price/download/csv/{{ ic_model }}" t-if="not is_zh" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">
-                                <span style="font-family: FontAwesome;">&#xf019;</span> Download CSV
-                            </a>
-                        </div>
+        
+        <style>
+            .tabs-container { display: flex; background: #fff; border-bottom: 1px solid #e9edf2; flex-wrap: wrap; padding: 0 12px; }
+            .tab { flex: 1; min-width: 125px; padding: 15px 12px; text-align: center; cursor: pointer; font-size: 15px; font-weight: 500; color: #3a546d; border-bottom: 3px solid transparent; transition: 0.2s; }
+            .tab.active { color: #1f6392; border-bottom-color: #2c7da0; font-weight: 600; background: #f1f6fa; }
+            .tab:hover:not(.active) { background: #f1f6fa; }
+            .search-box { display: flex; gap: 10px; padding: 15px; background: #f9fbfd; border-bottom: 1px solid #e2eaf1; }
+            .search-input { flex: 1; max-width: 400px; padding: 10px 18px; font-size: 14px; border: 1px solid #cbdde9; border-radius: 30px; outline: none; }
+            .search-input:focus { border-color: #2c7da0; box-shadow: 0 0 0 3px rgba(44,125,160,0.15); }
+            .search-btn { padding: 10px 24px; background: #2c7da0; color: white; border: none; border-radius: 30px; cursor: pointer; font-size: 14px; }
+            .search-btn:hover { background: #1f5e7a; }
+            .result-section { display: none; padding: 20px; }
+            .result-section.active { display: block; }
+        </style>
+        
+        <t t-set="is_zh" t-value="request.httprequest.path.startswith('/zh_CN')"/>
+        
+        <div style="background-color: #f5f5f5; min-height: 100vh; padding: 20px 0;">
+            <div style="max-width: 1400px; margin: 0 auto; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;">
+                <!-- Header -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; border-bottom: 1px solid #e6edf4;">
+                    <div>
+                        <a href="/odoo" style="color: #337ab7; text-decoration: none; font-size: 14px;">
+                            <i class="fa fa-home"></i> Home
+                        </a>
+                        <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="color: #337ab7; text-decoration: none; margin-left: 15px;">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                        <a t-attf-href="/price/query" t-if="not is_zh" style="color: #337ab7; text-decoration: none; margin-left: 15px;">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                        <h2 style="display: inline; margin-left: 15px;"><strong><t t-esc="ic_model"/></strong> 多平台比价</h2>
                     </div>
-                    
-                    <!-- 精简的状态信息 -->
-                    <div style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px;">
-                        <strong>Found <t t-esc="count"/> quotes</strong> - Query Time: <t t-esc="query_time"/>
-                    </div>
+                    <a t-attf-href="/zh_CN/price/download/csv/{{ ic_model }}" t-if="is_zh" style="background: #28a745; color: white; padding: 8px 18px; border-radius: 5px; text-decoration: none;">
+                        <i class="fa fa-download"></i> Download CSV
+                    </a>
                 </div>
                 
-                <t t-if="count > 0">
-                    <div style="background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden;">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <t t-if="ic_model"><input type="text" id="kw" class="search-input" placeholder="输入型号搜索..." t-att-value="ic_model"/></t>
+                    <t t-else=""><input type="text" id="kw" class="search-input" placeholder="输入型号搜索..."/></t>
+                    <button class="search-btn" onclick="doSearch()">搜索</button>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <div class="tab active" data-tab="0" onclick="switchTab(0)">📋 API报价</div>
+                    <div class="tab" data-tab="1" onclick="switchTab(1)">📦 圣禾堂</div>
+                    <div class="tab" data-tab="2" onclick="switchTab(2)">🌐 云汉芯城</div>
+                    <div class="tab" data-tab="3" onclick="openNewTab(3)">🛒 华秋商城</div>
+                    <div class="tab" data-tab="4" onclick="openNewTab(4)">📊 美迪瑞福</div>
+                </div>
+                
+                <!-- Tab 0: API Results -->
+                <div id="result0" class="result-section active">
+                    <div style="background: #d4edda; color: #155724; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px;">
+                        <strong>找到 <t t-esc="count"/> 个报价</strong> - 查询时间: <t t-esc="query_time"/>
+                    </div>
+                    <t t-if="count > 0">
                         <div style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead style="background: #343a40; color: white;">
@@ -126,100 +149,106 @@
                                         <th style="padding: 12px; text-align: center;">#</th>
                                         <th style="padding: 12px; text-align: left;">Supplier</th>
                                         <th style="padding: 12px; text-align: left;">Part Number</th>
-                                        <th style="padding: 12px; text-align: left;">Manufacturer</th>
                                         <th style="padding: 12px; text-align: right;">Price</th>
                                         <th style="padding: 12px; text-align: right;">RMB</th>
                                         <th style="padding: 12px; text-align: center;">Stock</th>
-                                        <th style="padding: 12px; text-align: center;" title="Minimum Order Quantity (最小订购量)">MOQ</th>
-                                        <th style="padding: 12px; text-align: left;" title="Estimated delivery time (交货期)">Lead Time</th>
-                                        <th style="padding: 12px; text-align: left;">Source</th>
-                                        <th style="padding: 12px; text-align: left;">Search URL</th>
+                                        <th style="padding: 12px; text-align: center;">MOQ</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <t t-set="idx" t-value="1"/>
                                     <tr t-foreach="quotes" t-as="quote" t-att-style="'border-bottom: 1px solid #eee; background-color: ' + (idx &lt;= 5 and '#e8f5e8' or 'transparent')">
                                         <td style="padding: 12px; text-align: center; color: #999;"><t t-esc="idx"/><t t-set="idx" t-value="idx+1"/></td>
-                                        <td style="padding: 12px;">
-                                            <span style="background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px;">
-                                                <t t-esc="quote.get('supplier', '')"/>
-                                            </span>
-                                        </td>
+                                        <td style="padding: 12px;"><span style="background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px;"><t t-esc="quote.get('supplier', '')"/></span></td>
                                         <td style="padding: 12px;"><strong><t t-esc="quote.get('part_number', '')"/></strong></td>
-                                        <td style="padding: 12px;"><t t-esc="quote.get('manufacturer', '-')"/></td>
-                                        <td style="padding: 12px; text-align: right;">
-                                            <strong><t t-esc="quote.get('price', '-')"/></strong>
-                                            <small style="color: #999;"><t t-esc="quote.get('currency', '')"/></small>
-                                        </td>
-                                        <td style="padding: 12px; text-align: right; color: #dc3545; font-weight: bold;">
-                                            <t t-esc="'%.2f' % quote.get('rmb', 0)"/>
-                                        </td>
+                                        <td style="padding: 12px; text-align: right;"><t t-esc="quote.get('price', '-')"/> <small style="color: #999;"><t t-esc="quote.get('currency', '')"/></small></td>
+                                        <td style="padding: 12px; text-align: right; color: #dc3545; font-weight: bold;"><t t-esc="'%.2f' % quote.get('rmb', 0)"/></td>
                                         <td style="padding: 12px; text-align: center;"><t t-esc="quote.get('stock', '-')"/></td>
-                                        <td style="padding: 12px; text-align: center;" title="Minimum Order Quantity"><t t-esc="quote.get('moq', '-')"/></td>
-                                        <td style="padding: 12px;" title="Estimated delivery time"><small><t t-esc="quote.get('lead_time', '-')"/></small></td>
-                                        <td style="padding: 12px;"><small style="color: #999;"><t t-esc="quote.get('source', '-')"/></small></td>
-                                        <td style="padding: 12px;">
-                                            <t t-if="quote.get('link')">
-                                                <a t-att-href="quote.get('link')" target="_blank" style="font-size: 12px; color: #007bff; text-decoration: none; word-break: break-all; max-width: 200px; display: inline-block;">
-                                                    <i class="fa fa-external-link-alt"></i> View
-                                                </a>
-                                            </t>
-                                            <t t-else="">
-                                                <span style="color: #999; font-size: 12px;">-</span>
-                                            </t>
-                                        </td>
+                                        <td style="padding: 12px; text-align: center;"><t t-esc="quote.get('moq', '-')"/></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    
-                    <!-- 列解释 -->
-                    <div style="background: #e7f3ff; color: #004085; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 13px; border-left: 4px solid #007bff;">
-                        <div style="font-weight: bold; color: #007bff; margin-bottom: 8px;">
-                            <i class="fas fa-info-circle"></i> Column Explanations:
+                    </t>
+                    <t t-else="">
+                        <div style="background: #fff3cd; color: #856404; padding: 30px; border-radius: 10px; text-align: center;">
+                            <h4><i class="fa fa-warning"></i> 没有找到报价</h4>
+                            <p>请尝试其他平台查看</p>
                         </div>
-                        <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-                            <div>
-                                <span style="font-weight: bold;">MOQ:</span>
-                                <span>Minimum Order Quantity (最小订购量)</span>
-                            </div>
-                            <div>
-                                <span style="font-weight: bold;">Lead Time:</span>
-                                <span>Estimated delivery time (交货期)</span>
-                            </div>
-                            <div>
-                                <span style="font-weight: bold;">Search URL:</span>
-                                <span>Direct link to product page (产品页面链接)</span>
-                            </div>
-                            <div>
-                                <span style="font-weight: bold;">Top 5 (Green):</span>
-                                <span>Lowest 5 prices highlighted in light green (最低5个价格用浅绿色高亮)</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">
-                            <span style="font-family: FontAwesome;">&#xf002;</span> Search Another IC
-                        </a>
-                        <a t-attf-href="/price/query" t-if="not is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">
-                            <span style="font-family: FontAwesome;">&#xf002;</span> Search Another IC
-                        </a>
-                    </div>
-                </t>
-                <t t-else="">
-                    <div style="background: #fff3cd; color: #856404; padding: 30px; border-radius: 10px; text-align: center;">
-                        <h4><span style="font-family: FontAwesome;">&#xf071;</span> No quotes found</h4>
-                        <p>No price quotes were found for <strong><t t-esc="ic_model"/></strong>.</p>
-                        <p style="margin-top: 20px;">
-                            <a t-attf-href="/zh_CN/price/query" t-if="is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">Try Another IC Model</a>
-                            <a t-attf-href="/price/query" t-if="not is_zh" style="display: inline-block; padding: 12px 25px; background: #007bff; color: white; border-radius: 5px; text-decoration: none;">Try Another IC Model</a>
-                        </p>
-                    </div>
-                </t>
+                    </t>
+                </div>
+                
+                <!-- Tab 1-2: Iframes -->
+                <div id="result1" class="result-section">
+                    <iframe id="iframe1" style="width: 100%; height: 600px; border: none;" src="about:blank"></iframe>
+                </div>
+                <div id="result2" class="result-section">
+                    <iframe id="iframe2" style="width: 100%; height: 600px; border: none;" src="about:blank"></iframe>
+                </div>
             </div>
+            
+            <script type="text/javascript">
+//<![CDATA[
+                var currentTab = 0;
+                function getUrl(platform, kw) {
+                    if (!kw) return '';
+                    var enc = encodeURIComponent(kw);
+                    var urls = {
+                        1: 'https://www.bomman.com/global-search?searchWord=' + enc + '&eventType=search',
+                        2: 'https://search.ickey.cn/?keyword=' + enc + '&bom_ab=null'
+                    };
+                    return urls[platform] || '';
+                }
+                function switchTab(idx) {
+                    currentTab = idx;
+                    document.querySelectorAll('.tab').forEach(function(t, i) {
+                        t.classList.toggle('active', i === idx);
+                    });
+                    for (var i = 0; i <= 4; i++) {
+                        var r = document.getElementById('result' + i);
+                        if (r) r.classList.toggle('active', i === idx);
+                    }
+                    var kw = document.getElementById('kw').value.trim();
+                    if (!kw) kw = '<t t-esc="ic_model"/>';
+                    if (kw && (idx === 1 || idx === 2)) {
+                        var f = document.getElementById('iframe' + idx);
+                        if (f && (f.src === 'about:blank' || f.src.indexOf(encodeURIComponent(kw)) < 0)) {
+                            f.src = getUrl(idx, kw);
+                        }
+                    }
+                }
+                function doSearch() {
+                    var kw = document.getElementById('kw').value.trim();
+                    if (!kw) { alert('请输入搜索关键词'); return; }
+                    window.location.href = '/zh_CN/price/query/submit?ic_model=' + encodeURIComponent(kw);
+                }
+                function openNewTab(idx) {
+                    var kw = document.getElementById('kw').value.trim();
+                    if (!kw) kw = '<t t-esc="ic_model"/>';
+                    if (!kw) { alert('请先搜索'); return; }
+                    var enc = encodeURIComponent(kw);
+                    var urls = {
+                        3: 'https://www.hqchip.com/search/' + enc + '.html',
+                        4: 'https://cn.brokerforum.com/electronic-components-search-zh.jsa?originalFullPartNumber=' + enc + '&hasNoSearchCriteria=false'
+                    };
+                    if (urls[idx]) {
+                        window.open(urls[idx], '_blank');
+                    }
+                }
+//]]>
+            </script>
         </div>
+        
+        <!-- Auto-load iframes -->
+        <script type="text/javascript">
+//<![CDATA[
+            var kwInput = document.getElementById('kw');
+            var model = kwInput.value.replace(/ /g, '+') || '<t t-esc="ic_model"/>';
+            if(model.indexOf('<') >= 0) model = 'GD32F103C8T6';
+            document.getElementById('iframe1').src = 'https://www.bomman.com/global-search?searchWord=' + model + '&eventType=search';
+            document.getElementById('iframe2').src = 'https://search.ickey.cn/?keyword=' + model + '&bom_ab=null';
+//]]>
+        </script>
     </template>
     
     <template id="config_page" name="Configuration Page">

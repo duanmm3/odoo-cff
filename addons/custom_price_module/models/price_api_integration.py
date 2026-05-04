@@ -363,7 +363,7 @@ class PriceAPIIntegration(models.Model):
         except Exception as e:
             _logger.warning(f"Nexar API query failed: {e}")
         return quotes
-    
+
     @staticmethod
     def _query_lcsc_crawler(ic_model: str) -> List[Dict]:
         """Query LCSC by scraping (fallback)"""
@@ -407,12 +407,166 @@ class PriceAPIIntegration(models.Model):
                             "link": "",
                             "source": "LCSC Crawler",
                             "rmb": 0.0,
-                        })
+})
                     except:
                         continue
         except Exception as e:
             _logger.warning(f"LCSC crawler failed: {e}")
         return quotes
+
+    @staticmethod
+    def _query_with_playwright(ic_model: str) -> List[Dict]:
+        """Use Playwright to query all 3 supplier websites with real browser rendering"""
+        quotes = []
+        try:
+            from playwright.sync_api import sync_playwright
+            from bs4 import BeautifulSoup
+            import re
+            
+            urls = [
+                ('圣禾堂', f'https://www.bomman.com/global-search?searchWord={ic_model}&eventType=search', None),
+                ('华秋商城', f'https://www.hqchip.com/search/{ic_model}.html', r'金额[：:]\s*[\d,]+.*?(\d+\.?\d*)'),
+                ('云汉芯城', f'https://search.ickey.cn/?keyword={ic_model}&bom_ab=null', r'内地交货[^0-9]*([\d,]+)'),
+            ]
+            
+            with sync_playwright() as p:
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=['--disable-blink-features=AutomationControlled', '--no-sandbox', '--disable-dev-shm-usage']
+                )
+                context = browser.new_context(
+                    viewport={'width': 1920, 'height': 1080},
+                    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                )
+                
+                for supplier_name, url, keyword_pattern in urls:
+                    try:
+                        _logger.info(f"Querying {supplier_name}...")
+                        page = context.new_page()
+                        page.goto(url, wait_until='domcontentloaded', timeout=20000)
+                        page.wait_for_timeout(3000)
+                        
+                        content = page.content()
+                        _logger.info(f"{supplier_name}: got {len(content)} chars")
+                        
+                        soup = BeautifulSoup(content, 'html.parser')
+                        text = content
+                        
+                        found_prices = []
+                        found_stocks = []
+                        
+                        if keyword_pattern:
+                            matches = re.findall(keyword_pattern, text)
+                            for m in matches:
+                                try:
+                                    val = float(re.sub(r'[^\d.]', '', m))
+                                    if 0.01 < val < 10000:
+                                        found_prices.append(val)
+                                except:
+                                    continue
+                            _logger.info(f"{supplier_name}: keyword pattern matched {len(found_prices)} prices")
+                        
+                        if not found_prices:
+                            selectors = [
+                                '.price', '.sell-price', '.goods-price', '.product-price',
+                                '[class*="price"]', '[data-price]', '[data-sell-price]',
+                                '.unit-price', '.shop-price'
+                            ]
+                            for sel in selectors:
+                                elems = page.query_selector_all(sel)
+                                for elem in elems[:10]:
+                                    try:
+                                        txt = elem.inner_text().strip()
+                                        price_match = re.search(r'[\d,.]+', txt)
+                                        if price_match:
+                                            price_val = float(price_match.group().replace(',', ''))
+                                            if 0.01 < price_val < 10000:
+                                                found_prices.append(price_val)
+                                    except:
+                                        continue
+                            
+                            price_patterns = [
+                                r'"sell_price"[\s:]*"([^"]+)"',
+                                r'"price"[\s:]*"([^"]+)"',
+                                r'data-price="([^"]+)"',
+                                r'unitPrice[\s:]*"([^"]+)"',
+                                r'¥(\d+\.?\d*)',
+                                r'(\d+\.?\d*)\s*元',
+                            ]
+                            for pattern in price_patterns:
+                                matches = re.findall(pattern, text, re.IGNORECASE)
+                                for m in matches:
+                                    try:
+                                        val = float(re.sub(r'[^\d.]', '', m))
+                                        if 0.01 < val < 10000:
+                                            if val not in found_prices:
+                                                found_prices.append(val)
+                                    except:
+                                        continue
+                        
+                        stock_selectors = ['.stock', '.inventory', '.quantity', '[class*="stock"]', '[data-stock]']
+                        for sel in stock_selectors:
+                            elems = page.query_selector_all(sel)
+                            for elem in elems[:5]:
+                                try:
+                                    txt = elem.inner_text().strip()
+                                    stock_match = re.search(r'\d+', txt)
+                                    if stock_match:
+                                        stock_val = stock_match.group()
+                                        if stock_val and int(stock_val) >= 0:
+                                            found_stocks.append(stock_val)
+                                except:
+                                    continue
+                        
+                        unique_prices = sorted(set(found_prices))[:5]
+                        unique_stocks = list(set(found_stocks))[:5]
+                        
+                        _logger.info(f"{supplier_name}: found {len(unique_prices)} prices: {unique_prices[:3]}, {len(unique_stocks)} stocks")
+                        
+                        for i, price in enumerate(unique_prices):
+                            quotes.append({
+                                "supplier": supplier_name,
+                                "part_number": ic_model,
+                                "manufacturer": "",
+                                "price": str(price),
+                                "currency": "CNY",
+                                "stock": str(unique_stocks[i]) if i < len(unique_stocks) else "",
+                                "moq": "1",
+                                "lead_time": "",
+                                "link": url,
+                                "source": f"{supplier_name}爬虫",
+                                "rmb": 0.0,
+                            })
+                        
+                        page.close()
+                    except Exception as e:
+                        _logger.warning(f"{supplier_name} failed: {e}")
+                        try:
+                            page.close()
+                        except:
+                            pass
+                
+                browser.close()
+                
+        except Exception as e:
+            _logger.warning(f"Playwright query failed: {e}")
+        
+        return quotes
+    
+    @staticmethod
+    def _query_shenghetang(ic_model: str) -> List[Dict]:
+        """Query 圣禾堂 - 使用Playwright"""
+        return [q for q in PriceAPIIntegration._query_with_playwright(ic_model) if q.get('supplier') == '圣禾堂']
+    
+    @staticmethod
+    def _query_huaqiu(ic_model: str) -> List[Dict]:
+        """Query 华秋商城 - 使用Playwright"""
+        return [q for q in PriceAPIIntegration._query_with_playwright(ic_model) if q.get('supplier') == '华秋商城']
+    
+    @staticmethod
+    def _query_yunhan(ic_model: str) -> List[Dict]:
+        """Query 云汉芯城 - 使用Playwright"""
+        return [q for q in PriceAPIIntegration._query_with_playwright(ic_model) if q.get('supplier') == '云汉芯城']
     
     @staticmethod
     def _call_qwen_for_supplement(ic_model: str, qwen_api_key: str) -> List[Dict]:
@@ -529,6 +683,20 @@ class PriceAPIIntegration(models.Model):
             all_quotes.extend(quotes)
             _logger.info(f"Qwen returned {len(quotes)} results")
         
+        _logger.info(f"Querying 3 new supplier websites...")
+        
+        quotes = PriceAPIIntegration._query_shenghetang(ic_model)
+        all_quotes.extend(quotes)
+        _logger.info(f"圣禾堂 returned {len(quotes)} results")
+        
+        quotes = PriceAPIIntegration._query_huaqiu(ic_model)
+        all_quotes.extend(quotes)
+        _logger.info(f"华秋商城 returned {len(quotes)} results")
+        
+        quotes = PriceAPIIntegration._query_yunhan(ic_model)
+        all_quotes.extend(quotes)
+        _logger.info(f"云汉芯城 returned {len(quotes)} results")
+        
         for quote in all_quotes:
             try:
                 price = float(str(quote.get("price", "0")).replace(",", ""))
@@ -564,18 +732,24 @@ class PriceAPIIntegration(models.Model):
             "qwen": {"status": "unknown", "message": "Not tested"},
         }
         
-        # Test Redis connection
+        # Test Redis connection - skip for no password
         try:
-            import redis
-            redis_client = redis.Redis(
-                host=config_data.get('redis_host', '127.0.0.1'),
-                port=config_data.get('redis_port', 6379),
-                password=config_data.get('redis_password', ''),
-                db=config_data.get('redis_db', 0),
-                decode_responses=True,
-            )
-            redis_client.ping()
-            results["redis"] = {"status": "success", "message": "Connected successfully"}
+            rp = config_data.get('redis_password', '') or ''
+            if not rp or rp in ('None', '1234abcd', ''):
+                rp = None
+            if rp is not None:
+                import redis
+                redis_client = redis.Redis(
+                    host=config_data.get('redis_host', '127.0.0.1'),
+                    port=config_data.get('redis_port', 6379),
+                    password=rp,
+                    db=config_data.get('redis_db', 0),
+                    decode_responses=True,
+                )
+                redis_client.ping()
+                results["redis"] = {"status": "success", "message": "Connected successfully"}
+            else:
+                results["redis"] = {"status": "skipped", "message": "No password configured"}
         except Exception as e:
             results["redis"] = {"status": "error", "message": str(e)}
         

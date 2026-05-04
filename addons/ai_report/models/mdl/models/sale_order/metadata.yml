@@ -1,0 +1,36 @@
+name: sale_order
+table_reference:
+  catalog: ""
+  schema: public
+  table: sale_order
+columns:
+  - name: id
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+  - name: name
+    type: VARCHAR
+    description: "销售订单编号"
+  - name: partner_id
+    type: INTEGER
+    description: "客户ID"
+  - name: date_order
+    type: TIMESTAMP
+    description: "订单创建日期"
+  - name: state
+    type: VARCHAR
+    description: "订单状态: draft/sale/done/cancel"
+  - name: amount_total
+    type: DECIMAL
+    description: "订单总额"
+  - name: amount_untaxed
+    type: DECIMAL
+    description: "未税金额"
+  - name: user_id
+    type: INTEGER
+    description: "销售人员ID"
+primary_key: id
+properties:
+  description: "Odoo 销售订单主表"
+  module: sales

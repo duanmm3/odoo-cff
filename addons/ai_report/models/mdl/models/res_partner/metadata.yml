@@ -1,0 +1,31 @@
+name: res_partner
+table_reference:
+  catalog: ""
+  schema: public
+  table: res_partner
+columns:
+  - name: id
+    type: INTEGER
+    is_primary_key: true
+  - name: name
+    type: VARCHAR
+    description: "名称"
+  - name: email
+    type: VARCHAR
+    description: "邮箱"
+  - name: phone
+    type: VARCHAR
+    description: "电话"
+  - name: is_company
+    type: BOOLEAN
+    description: "是否是公司"
+  - name: supplier_rank
+    type: INTEGER
+    description: "供应商等级"
+  - name: customer_rank
+    type: INTEGER
+    description: "客户等级"
+primary_key: id
+properties:
+  description: "客户/供应商"
+  module: common

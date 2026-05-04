@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Report Actions -->
+    <record id="action_ai_report_chat_page" model="ir.actions.act_url">
+        <field name="name">AI Report 对话</field>
+        <field name="type">ir.actions.act_url</field>
+        <field name="url">/ai_report</field>
+        <field name="target">self</field>
+    </record>
+
+    <!-- Main menu for AI Report Module -->
+    <menuitem id="menu_ai_root" name="AI" sequence="100"/>
+    
+    <!-- Chat Menu -->
+    <menuitem id="menu_ai_report_chat" name="智能查询" parent="menu_ai_root" action="action_ai_report_chat_page" sequence="10"/>
+    
+    <!-- Settings Menu -->
+    <menuitem id="menu_ai_report_settings" name="设置" parent="menu_ai_root" action="ai_report.action_ai_report_settings" sequence="30"/>
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- AI Report User Group -->
+    <record id="group_ai_report_user" model="res.groups">
+        <field name="name">AI Report User</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Sales Analyst -->
+    <record id="group_sales_analyst" model="res.groups">
+        <field name="name">Sales Analyst</field>
+        <field name="implied_ids" eval="[(4, ref('group_ai_report_user'))]"/>
+    </record>
+
+    <!-- Purchase Analyst -->
+    <record id="group_purchase_analyst" model="res.groups">
+        <field name="name">Purchase Analyst</field>
+        <field name="implied_ids" eval="[(4, ref('group_ai_report_user'))]"/>
+    </record>
+
+    <!-- Warehouse Analyst -->
+    <record id="group_warehouse_analyst" model="res.groups">
+        <field name="name">Warehouse Analyst</field>
+        <field name="implied_ids" eval="[(4, ref('group_ai_report_user'))]"/>
+    </record>
+
+    <!-- AI Report Manager -->
+    <record id="group_ai_report_manager" model="res.groups">
+        <field name="name">AI Report Manager</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+</odoo>

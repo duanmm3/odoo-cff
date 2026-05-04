@@ -1,17 +1,20 @@
 {
     'name': 'IC Price Query Module',
-    'version': '1.0',
+    'version': '4.4',
     'category': 'Tools',
     'summary': 'Electronic component price query system integrated with multiple suppliers',
-    'description': """
-IC Price Query Module
-=====================
-This module provides an electronic component price query system that integrates with multiple suppliers:
-- Mouser API
-- LCSC (crawler)
-- Nexar API
-- OEMSecrets API
-- Qwen AI for supplementary queries
+'description': """
+ IC Price Query Module
+ =====================
+ This module provides an electronic component price query system that integrates with multiple suppliers:
+ - Mouser API
+ - LCSC (crawler)
+ - Nexar API
+ - OEMSecrets API
+ - Qwen AI for supplementary queries
+ - 圣禾堂 (bomman.com)
+ - 华秋商城 (hqchip.com)
+ - 云汉芯城 (ickey.cn)
 
 Features:
 ---------

@@ -1,0 +1,6 @@
+schema_version: 3
+name: odoo_bi_project
+version: "3.0"
+catalog: wren
+schema: public
+data_source: postgres

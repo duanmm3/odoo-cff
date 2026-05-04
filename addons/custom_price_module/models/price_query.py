@@ -32,7 +32,7 @@ class PriceQuery(models.Model):
     # Redis configuration
     redis_host = fields.Char(string='Redis Host', default='127.0.0.1')
     redis_port = fields.Integer(string='Redis Port', default=6379)
-    redis_password = fields.Char(string='Redis Password', default='1234abcd')
+    redis_password = fields.Char(string='Redis Password', default='NO_PASSWORD')  # Special value means no password
     redis_db = fields.Integer(string='Redis DB', default=0)
     
     # Exchange rate configuration
@@ -67,10 +67,15 @@ class PriceQuery(models.Model):
         try:
             import redis
             config = self.get_config()
+            redis_password = config.redis_password
+            # Special value 'NO_PASSWORD' means no password
+            if redis_password in (False, None, '', 'NO_PASSWORD', 'None', '1234abcd'):
+                _logger.info("Redis: No password configured, skip connection")
+                return None  # Skip Redis, return None
             return redis.Redis(
                 host=config.redis_host,
                 port=config.redis_port,
-                password=config.redis_password,
+                password=redis_password,
                 db=config.redis_db,
                 decode_responses=True,
             )
@@ -78,54 +83,64 @@ class PriceQuery(models.Model):
             _logger.warning("Redis module not installed")
             return None
         except Exception as e:
-            _logger.error(f"Redis connection error: {e}")
+            _logger.warning(f"Redis connection error: {e}")
             return None
     
     def get_cache(self, ic_model: str, date: str = None) -> Optional[Dict]:
         """Get cached price data"""
-        redis_client = self.get_redis_client()
-        if not redis_client:
-            return None
-        
-        if not date:
-            date = time.strftime("%Y%m%d")
-        
-        key = f"Price:IC:{ic_model}:{date}"
-        value = redis_client.get(key)
-        if value:
-            try:
-                return json.loads(value)
-            except:
-                pass
+        try:
+            redis_client = self.get_redis_client()
+            if not redis_client:
+                return None
+            
+            if not date:
+                date = time.strftime("%Y%m%d")
+            
+            key = f"Price:IC:{ic_model}:{date}"
+            value = redis_client.get(key)
+            if value:
+                try:
+                    return json.loads(value)
+                except:
+                    pass
+        except Exception as e:
+            _logger.warning(f"Redis get_cache error: {e}")
         return None
     
     def set_cache(self, ic_model: str, data: Dict):
         """Set cache with price data"""
-        redis_client = self.get_redis_client()
-        if not redis_client:
-            return
-        
-        today = time.strftime("%Y%m%d")
-        key = f"Price:IC:{ic_model}:{today}"
-        value = json.dumps(data, ensure_ascii=False)
-        redis_client.set(key, value)
+        try:
+            redis_client = self.get_redis_client()
+            if not redis_client:
+                return
+            
+            today = time.strftime("%Y%m%d")
+            key = f"Price:IC:{ic_model}:{today}"
+            value = json.dumps(data, ensure_ascii=False)
+            redis_client.set(key, value)
+        except Exception as e:
+            _logger.warning(f"Redis set_cache error: {e}")
     
     def get_history_dates(self, ic_model: str) -> List[str]:
         """Get historical dates for an IC model"""
-        redis_client = self.get_redis_client()
-        if not redis_client:
+        try:
+            redis_client = self.get_redis_client()
+            if not redis_client:
+                return []
+            
+            pattern = f"Price:IC:{ic_model}:*"
+            keys = redis_client.keys(pattern)
+            
+            dates = []
+            for key in keys:
+                parts = key.split(":")
+                if len(parts) >= 4:
+                    dates.append(parts[3])
+            
+            return sorted(dates)
+        except Exception as e:
+            _logger.warning(f"Redis get_history_dates error: {e}")
             return []
-        
-        pattern = f"Price:IC:{ic_model}:*"
-        keys = redis_client.keys(pattern)
-        
-        dates = []
-        for key in keys:
-            parts = key.split(":")
-            if len(parts) >= 4:
-                dates.append(parts[3])
-        
-        return sorted(dates)
     
     def fetch_exchange_rates(self) -> Optional[Dict[str, float]]:
         """Fetch exchange rates from API"""
@@ -323,13 +338,16 @@ class PriceQuery(models.Model):
     def action_clear_cache(self):
         """Clear cache for this IC model"""
         self.ensure_one()
-        redis_client = self.get_redis_client()
-        if redis_client:
-            pattern = f"Price:IC:{self.name}:*"
-            keys = redis_client.keys(pattern)
-            if keys:
-                redis_client.delete(*keys)
-                _logger.info(f"Cleared cache for {self.name}: {len(keys)} keys")
+        try:
+            redis_client = self.get_redis_client()
+            if redis_client:
+                pattern = f"Price:IC:{self.name}:*"
+                keys = redis_client.keys(pattern)
+                if keys:
+                    redis_client.delete(*keys)
+                    _logger.info(f"Cleared cache for {self.name}: {len(keys)} keys")
+        except Exception as e:
+            _logger.warning(f"Redis clear_cache error: {e}")
         
         return {
             'type': 'ir.actions.client',
