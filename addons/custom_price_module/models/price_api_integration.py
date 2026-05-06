@@ -725,33 +725,14 @@ class PriceAPIIntegration(models.Model):
     def test_api_connection(self, config_data: Dict) -> Dict:
         """Test API connections"""
         results = {
-            "redis": {"status": "unknown", "message": "Not tested"},
+            "redis": {"status": "disabled", "message": "Redis integration removed"},
             "mouser": {"status": "unknown", "message": "Not tested"},
             "nexar": {"status": "unknown", "message": "Not tested"},
             "oemsecrets": {"status": "unknown", "message": "Not tested"},
             "qwen": {"status": "unknown", "message": "Not tested"},
         }
         
-        # Test Redis connection - skip for no password
-        try:
-            rp = config_data.get('redis_password', '') or ''
-            if not rp or rp in ('None', '1234abcd', ''):
-                rp = None
-            if rp is not None:
-                import redis
-                redis_client = redis.Redis(
-                    host=config_data.get('redis_host', '127.0.0.1'),
-                    port=config_data.get('redis_port', 6379),
-                    password=rp,
-                    db=config_data.get('redis_db', 0),
-                    decode_responses=True,
-                )
-                redis_client.ping()
-                results["redis"] = {"status": "success", "message": "Connected successfully"}
-            else:
-                results["redis"] = {"status": "skipped", "message": "No password configured"}
-        except Exception as e:
-            results["redis"] = {"status": "error", "message": str(e)}
+        # Redis integration has been removed; skip Redis testing.
         
         # Test Mouser API (basic test)
         if config_data.get('mouser_api_key'):

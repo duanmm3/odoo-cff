@@ -71,16 +71,6 @@
                                     <field name="qwen_api_key" password="True"/>
                                 </group>
                             </group>
-                            <group string="Redis Configuration">
-                                <group>
-                                    <field name="redis_host"/>
-                                    <field name="redis_port"/>
-                                </group>
-                                <group>
-                                    <field name="redis_password" password="True"/>
-                                    <field name="redis_db"/>
-                                </group>
-                            </group>
                             <group string="Exchange Rate Configuration">
                                 <field name="exchange_api_url"/>
                             </group>

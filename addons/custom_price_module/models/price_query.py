@@ -29,12 +29,6 @@ class PriceQuery(models.Model):
     oemsecrets_api_key = fields.Char(string='OEMSecrets API Key')
     qwen_api_key = fields.Char(string='Qwen API Key')
     
-    # Redis configuration
-    redis_host = fields.Char(string='Redis Host', default='127.0.0.1')
-    redis_port = fields.Integer(string='Redis Port', default=6379)
-    redis_password = fields.Char(string='Redis Password', default='NO_PASSWORD')  # Special value means no password
-    redis_db = fields.Integer(string='Redis DB', default=0)
-    
     # Exchange rate configuration
     exchange_api_url = fields.Char(
         string='Exchange API URL', 
@@ -61,86 +55,6 @@ class PriceQuery(models.Model):
         else:
             _logger.info(f"Found existing config, mouser_key: {bool(config.mouser_api_key)}, qwen_key: {bool(config.qwen_api_key)}")
         return config
-    
-    def get_redis_client(self):
-        """Get Redis client connection"""
-        try:
-            import redis
-            config = self.get_config()
-            redis_password = config.redis_password
-            # Special value 'NO_PASSWORD' means no password
-            if redis_password in (False, None, '', 'NO_PASSWORD', 'None', '1234abcd'):
-                _logger.info("Redis: No password configured, skip connection")
-                return None  # Skip Redis, return None
-            return redis.Redis(
-                host=config.redis_host,
-                port=config.redis_port,
-                password=redis_password,
-                db=config.redis_db,
-                decode_responses=True,
-            )
-        except ImportError:
-            _logger.warning("Redis module not installed")
-            return None
-        except Exception as e:
-            _logger.warning(f"Redis connection error: {e}")
-            return None
-    
-    def get_cache(self, ic_model: str, date: str = None) -> Optional[Dict]:
-        """Get cached price data"""
-        try:
-            redis_client = self.get_redis_client()
-            if not redis_client:
-                return None
-            
-            if not date:
-                date = time.strftime("%Y%m%d")
-            
-            key = f"Price:IC:{ic_model}:{date}"
-            value = redis_client.get(key)
-            if value:
-                try:
-                    return json.loads(value)
-                except:
-                    pass
-        except Exception as e:
-            _logger.warning(f"Redis get_cache error: {e}")
-        return None
-    
-    def set_cache(self, ic_model: str, data: Dict):
-        """Set cache with price data"""
-        try:
-            redis_client = self.get_redis_client()
-            if not redis_client:
-                return
-            
-            today = time.strftime("%Y%m%d")
-            key = f"Price:IC:{ic_model}:{today}"
-            value = json.dumps(data, ensure_ascii=False)
-            redis_client.set(key, value)
-        except Exception as e:
-            _logger.warning(f"Redis set_cache error: {e}")
-    
-    def get_history_dates(self, ic_model: str) -> List[str]:
-        """Get historical dates for an IC model"""
-        try:
-            redis_client = self.get_redis_client()
-            if not redis_client:
-                return []
-            
-            pattern = f"Price:IC:{ic_model}:*"
-            keys = redis_client.keys(pattern)
-            
-            dates = []
-            for key in keys:
-                parts = key.split(":")
-                if len(parts) >= 4:
-                    dates.append(parts[3])
-            
-            return sorted(dates)
-        except Exception as e:
-            _logger.warning(f"Redis get_history_dates error: {e}")
-            return []
     
     def fetch_exchange_rates(self) -> Optional[Dict[str, float]]:
         """Fetch exchange rates from API"""
@@ -182,16 +96,6 @@ class PriceQuery(models.Model):
     
     def query_prices(self, ic_model: str, force_refresh: bool = False) -> Dict:
         """Main query function - uses API integration"""
-        # Check cache first
-        if not force_refresh:
-            cached = self.get_cache(ic_model)
-            if cached:
-                _logger.info(f"Using cache for: {ic_model}, force_refresh={force_refresh}")
-                return cached
-            _logger.info(f"No cache found for: {ic_model}, force_refresh={force_refresh}")
-        else:
-            _logger.info(f"Force refresh enabled for: {ic_model}")
-        
         # Get configuration
         config = self.get_config()
         
@@ -209,10 +113,6 @@ class PriceQuery(models.Model):
             'nexar_client_secret': config.nexar_client_secret or DEFAULT_KEYS['nexar_client_secret'],
             'oemsecrets_api_key': config.oemsecrets_api_key or DEFAULT_KEYS['oemsecrets_api_key'],
             'qwen_api_key': config.qwen_api_key or DEFAULT_KEYS['qwen_api_key'],
-            'redis_host': config.redis_host or '127.0.0.1',
-            'redis_port': config.redis_port or 6379,
-            'redis_password': config.redis_password or '1234abcd',
-            'redis_db': config.redis_db or 0,
         }
         
         _logger.info(f"Using API keys - mouser: {bool(config_data['mouser_api_key'])}, oemsecrets: {bool(config_data['oemsecrets_api_key'])}, qwen: {bool(config_data['qwen_api_key'])}")
@@ -221,9 +121,6 @@ class PriceQuery(models.Model):
         # Call API integration
         api_model = self.env['price.api.integration']
         result = api_model.query_prices_with_apis(ic_model, config_data, force_refresh)
-        
-        # Cache the result
-        self.set_cache(ic_model, result)
         
         # Update query record
         query_record = self.search([('name', '=', ic_model)], limit=1)
@@ -302,27 +199,17 @@ class PriceQuery(models.Model):
         }
     
     def action_view_history(self):
-        """View historical prices for this IC model"""
+        """View the recent query records for this IC model"""
         self.ensure_one()
-        dates = self.get_history_dates(self.name)
+        history_records = self.search([('name', '=', self.name)], order='query_date desc')
         
-        history_data = []
-        for date in dates:
-            cached = self.get_cache(self.name, date)
-            if cached:
-                history_data.append({
-                    'date': date,
-                    'count': cached.get('count', 0),
-                    'query_time': cached.get('query_time'),
-                })
+        message = _('Recent query records for %s:\n') % self.name
+        for record in history_records[:5]:
+            query_time = record.query_date.strftime('%Y-%m-%d %H:%M:%S') if record.query_date else _('Unknown')
+            message += _('- %s: %s quotes\n') % (query_time, record.total_quotes or 0)
         
-        # Return a notification with history info
-        message = _('Historical prices for %s:\n') % self.name
-        for item in history_data[:5]:  # Show last 5
-            message += _('- %s: %d quotes\n') % (item['date'], item['count'])
-        
-        if len(history_data) > 5:
-            message += _('... and %d more') % (len(history_data) - 5)
+        if len(history_records) > 5:
+            message += _('... and %d more') % (len(history_records) - 5)
         
         return {
             'type': 'ir.actions.client',

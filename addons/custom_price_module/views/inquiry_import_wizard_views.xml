@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 批量导入报价需求向导 -->
+    <record id="view_inquiry_request_import_wizard_form" model="ir.ui.view">
+        <field name="name">批量导入报价需求</field>
+        <field name="model">inquiry.request.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="批量导入报价需求">
+                <group>
+                    <field name="import_data" nolabel="1" placeholder="产品型号, 数量&#10;cff1, 10&#10;cff2, 11"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_import" string="确认导入" type="object" class="btn-primary"/>
+                    <button string="取消" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- 批量导入动作 -->
+    <record id="action_inquiry_request_import_wizard" model="ir.actions.act_window">
+        <field name="name">批量导入产品型号</field>
+        <field name="res_model">inquiry.request.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_inquiry_request"/>
+        <field name="binding_view_types">list</field>
+    </record>
+</odoo>

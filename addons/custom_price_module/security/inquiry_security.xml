@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inquiry Analysis Groups -->
+        <record id="group_inquiry_user" model="res.groups">
+            <field name="name">Inquiry Analysis / User</field>
+        </record>
+
+        <record id="group_inquiry_manager" model="res.groups">
+            <field name="name">Inquiry Analysis / Manager</field>
+            <field name="implied_ids" eval="[(4, ref('group_inquiry_user'))]"/>
+        </record>
+
+        <!-- Access Rules for Inquiry Request -->
+        <record id="inquiry_request_rule_sales" model="ir.rule">
+            <field name="name">Inquiry Request - Sales Access</field>
+            <field name="model_id" ref="model_inquiry_request"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="domain_force">[('salesperson_id', '=', user.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="inquiry_request_rule_purchase" model="ir.rule">
+            <field name="name">Inquiry Request - Purchase Access</field>
+            <field name="model_id" ref="model_inquiry_request"/>
+            <field name="groups" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="inquiry_request_rule_manager" model="ir.rule">
+            <field name="name">Inquiry Request - Manager Access</field>
+            <field name="model_id" ref="model_inquiry_request"/>
+            <field name="groups" eval="[(4, ref('group_inquiry_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <!-- Access Rules for Inquiry Quote -->
+        <record id="inquiry_quote_rule_buyer" model="ir.rule">
+            <field name="name">Inquiry Quote - Buyer Access</field>
+            <field name="model_id" ref="model_inquiry_quote"/>
+            <field name="groups" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+            <field name="domain_force">[('buyer_id', '=', user.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="inquiry_quote_rule_sales" model="ir.rule">
+            <field name="name">Inquiry Quote - Sales Access</field>
+            <field name="model_id" ref="model_inquiry_quote"/>
+            <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="inquiry_quote_rule_manager" model="ir.rule">
+            <field name="name">Inquiry Quote - Manager Access</field>
+            <field name="model_id" ref="model_inquiry_quote"/>
+            <field name="groups" eval="[(4, ref('group_inquiry_manager'))]"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+    </data>
+</odoo>

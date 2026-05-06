@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 采购报价列表视图 -->
+    <record id="view_inquiry_quote_list" model="ir.ui.view">
+        <field name="name">采购报价列表</field>
+        <field name="model">inquiry.quote</field>
+        <field name="arch" type="xml">
+            <list string="采购报价" default_order="create_date desc" decoration-danger="state == 'draft'" decoration-success="state == 'submitted'">
+                <field name="request_id" string="报价需求"/>
+                <field name="buyer_id" string="采购员"/>
+                <field name="price" string="报价金额"/>
+                <field name="supplier_code" string="供应商编码"/>
+                <field name="state" string="状态" widget="badge"/>
+                <field name="create_date" string="创建时间"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 采购报价内嵌视图 -->
+    <record id="view_inquiry_quote_tree" model="ir.ui.view">
+        <field name="name">采购报价内嵌</field>
+        <field name="model">inquiry.quote</field>
+        <field name="arch" type="xml">
+            <list string="报价">
+                <field name="buyer_id" string="采购员"/>
+                <field name="price" string="报价"/>
+                <field name="supplier_id" string="供应商编码"/>
+                <field name="remark" string="备注"/>
+                <field name="state" string="状态" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- 采购报价表单视图 -->
+    <record id="view_inquiry_quote_form" model="ir.ui.view">
+        <field name="name">采购报价表单</field>
+        <field name="model">inquiry.quote</field>
+        <field name="arch" type="xml">
+            <form string="采购报价">
+                <header>
+                    <button name="action_cancel_quote" type="object" string="取消报价"
+                            invisible="state in ['cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="request_id" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="报价信息">
+                            <field name="buyer_id" string="采购员" readonly="1"/>
+                            <field name="price" string="报价金额" required="1"/>
+                            <field name="supplier_id" string="供应商" domain="[('supplier_rank', '>', 0)]" context="{'search_default_ref': 1}" placeholder="输入编码或名称搜索"/>
+                            <field name="supplier_code" string="供应商编码" readonly="1"/>
+                        </group>
+                        <group string="需求信息">
+                            <field name="request_partner_id" string="客户" readonly="1"/>
+                            <field name="request_product_name" string="产品型号" readonly="1"/>
+                            <field name="request_product_qty" string="数量" readonly="1"/>
+                            <field name="request_salesperson_id" string="销售员" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="备注">
+                        <field name="remark" string="备注说明" nolabel="1" placeholder="填写报价备注信息..."/>
+                    </group>
+                    <notebook>
+                        <page string="价格参考" name="price_query">
+                            <field name="price_iframe"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 搜索视图 -->
+    <record id="view_inquiry_quote_search" model="ir.ui.view">
+        <field name="name">采购报价搜索</field>
+        <field name="model">inquiry.quote</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="request_id"/>
+                <field name="buyer_id"/>
+                <field name="supplier_id"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- 采购报价动作 -->
+    <record id="action_inquiry_quote" model="ir.actions.act_window">
+        <field name="name">我的报价</field>
+        <field name="res_model">inquiry.quote</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('buyer_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                暂无报价记录
+            </p>
+            <p>
+                您提交的报价将显示在这里
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="inquiry_request_page" name="Inquiry Request Page">
+        <t t-call="website.layout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1>Inquiry Analysis System</h1>
+                        <p>Welcome to the Inquiry Analysis System. This system enables seamless collaboration between sales and purchase teams.</p>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">For Sales Team</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Create inquiry requests for customers</li>
+                                            <li>View all quotes from purchase team</li>
+                                            <li>Compare prices and select best offers</li>
+                                            <li>Generate sales orders automatically</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">For Purchase Team</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Receive inquiry requests automatically</li>
+                                            <li>Submit competitive quotes</li>
+                                            <li>Manage supplier relationships</li>
+                                            <li>Track quotation history</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
