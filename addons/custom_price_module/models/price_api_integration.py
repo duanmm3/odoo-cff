@@ -542,7 +542,8 @@ class PriceAPIIntegration(models.Model):
                     except Exception as e:
                         _logger.warning(f"{supplier_name} failed: {e}")
                         try:
-                            page.close()
+                            if 'page' in locals():
+                                page.close()
                         except:
                             pass
                 
@@ -640,10 +641,11 @@ class PriceAPIIntegration(models.Model):
     @api.model
     def query_prices_with_apis(self, ic_model: str, config_data: Dict, force_refresh: bool = False) -> Dict:
         """Query prices using APIs"""
-        _logger.info(f"Querying prices for: {ic_model}, force_refresh: {force_refresh}")
+        _logger.info(f"=== Starting price query for: {ic_model}, force_refresh: {force_refresh} ===")
         
         all_quotes = []
         rates = self._get_exchange_rates()
+        _logger.info(f"Exchange rates loaded: {bool(rates)}")
         
         DEFAULT_KEYS = {
             'mouser_api_key': '44f969dc-f1bb-49dc-a2ac-a77d1788d0a6',
@@ -653,62 +655,75 @@ class PriceAPIIntegration(models.Model):
             'qwen_api_key': 'sk-4b767ecd4c414df5a9aa948617dff88a',
         }
         
-        # Only use Mouser, OEMSecrets, and Qwen (disable Nexar and LCSC)
         mouser_key = config_data.get('mouser_api_key') or DEFAULT_KEYS.get('mouser_api_key')
         _logger.info(f"Using Mouser key: {bool(mouser_key)}")
-        if mouser_key:
-            quotes = PriceAPIIntegration._query_mouser_api(ic_model, mouser_key)
-            all_quotes.extend(quotes)
-            _logger.info(f"Mouser returned {len(quotes)} results")
+        try:
+            if mouser_key:
+                quotes = PriceAPIIntegration._query_mouser_api(ic_model, mouser_key)
+                all_quotes.extend(quotes)
+                _logger.info(f"Mouser returned {len(quotes)} results")
+        except Exception as e:
+            _logger.error(f"Mouser query exception: {e}")
         
         oemsecrets_key = config_data.get('oemsecrets_api_key') or DEFAULT_KEYS.get('oemsecrets_api_key')
         _logger.info(f"Using OEMSecrets key: {bool(oemsecrets_key)}")
-        if oemsecrets_key:
-            quotes = PriceAPIIntegration._query_oemsecrets_api(ic_model, oemsecrets_key)
-            all_quotes.extend(quotes)
-            _logger.info(f"OEMSecrets returned {len(quotes)} results")
-        
-        # Nexar disabled
-        # nexar_id = config_data.get('nexar_client_id') or DEFAULT_KEYS.get('nexar_client_id')
-        # nexar_secret = config_data.get('nexar_client_secret') or DEFAULT_KEYS.get('nexar_client_secret')
-        
-        # LCSC disabled - requires more complex parsing
-        # quotes = PriceAPIIntegration._query_lcsc_crawler(ic_model)
-        # all_quotes.extend(quotes)
+        try:
+            if oemsecrets_key:
+                quotes = PriceAPIIntegration._query_oemsecrets_api(ic_model, oemsecrets_key)
+                all_quotes.extend(quotes)
+                _logger.info(f"OEMSecrets returned {len(quotes)} results")
+        except Exception as e:
+            _logger.error(f"OEMSecrets query exception: {e}")
         
         qwen_key = config_data.get('qwen_api_key') or DEFAULT_KEYS.get('qwen_api_key')
         _logger.info(f"Using Qwen key: {bool(qwen_key)}")
-        if qwen_key:
-            quotes = PriceAPIIntegration._call_qwen_for_supplement(ic_model, qwen_key)
+        # Qwen API disabled for faster response
+        # try:
+        #     if qwen_key:
+        #         quotes = PriceAPIIntegration._call_qwen_for_supplement(ic_model, qwen_key)
+        #         all_quotes.extend(quotes)
+        #         _logger.info(f"Qwen returned {len(quotes)} results")
+        # except Exception as e:
+        #     _logger.error(f"Qwen query exception: {e}")
+        
+        _logger.info("Attempting Playwright queries for Chinese suppliers...")
+        
+        try:
+            quotes = PriceAPIIntegration._query_shenghetang(ic_model)
             all_quotes.extend(quotes)
-            _logger.info(f"Qwen returned {len(quotes)} results")
+            _logger.info(f"圣禾堂 returned {len(quotes)} results")
+        except Exception as e:
+            _logger.warning(f"圣禾堂 query failed: {e}")
         
-        _logger.info(f"Querying 3 new supplier websites...")
+        try:
+            quotes = PriceAPIIntegration._query_huaqiu(ic_model)
+            all_quotes.extend(quotes)
+            _logger.info(f"华秋商城 returned {len(quotes)} results")
+        except Exception as e:
+            _logger.warning(f"华秋商城 query failed: {e}")
         
-        quotes = PriceAPIIntegration._query_shenghetang(ic_model)
-        all_quotes.extend(quotes)
-        _logger.info(f"圣禾堂 returned {len(quotes)} results")
-        
-        quotes = PriceAPIIntegration._query_huaqiu(ic_model)
-        all_quotes.extend(quotes)
-        _logger.info(f"华秋商城 returned {len(quotes)} results")
-        
-        quotes = PriceAPIIntegration._query_yunhan(ic_model)
-        all_quotes.extend(quotes)
-        _logger.info(f"云汉芯城 returned {len(quotes)} results")
+        try:
+            quotes = PriceAPIIntegration._query_yunhan(ic_model)
+            all_quotes.extend(quotes)
+            _logger.info(f"云汉芯城 returned {len(quotes)} results")
+        except Exception as e:
+            _logger.warning(f"云汉芯城 query failed: {e}")
         
         for quote in all_quotes:
             try:
                 price = float(str(quote.get("price", "0")).replace(",", ""))
                 currency = quote.get("currency", "USD")
                 quote["rmb"] = PriceAPIIntegration._convert_to_rmb_static(price, currency, rates)
-            except:
+            except Exception as e:
+                _logger.warning(f"Failed to convert price for quote: {quote}, error: {e}")
                 quote["rmb"] = 0.0
         
         # 按RMB价格排序（从小到大）
         all_quotes.sort(key=lambda x: x.get("rmb", float('inf')))
         
         _logger.info(f"Final result: {len(all_quotes)} quotes found, sorted by RMB price")
+        if all_quotes:
+            _logger.info(f"Sample quotes: {all_quotes[:2]}")
         
         result = {
             "ic_model": ic_model,
@@ -719,6 +734,7 @@ class PriceAPIIntegration(models.Model):
             "message": f"Found {len(all_quotes)} quotes from APIs" if all_quotes else "No price data found from any supplier API. Please check API keys and try again.",
         }
         
+        _logger.info(f"Returning result with count={result['count']}, status={result['status']}")
         return result
     
     @api.model

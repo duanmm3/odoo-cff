@@ -131,11 +131,34 @@ class InquiryRequest(models.Model):
 
     def _compute_purchase_users(self):
         users = self.env['res.users'].search([
-            ('name', 'in', ['Cathy', 'Susan', 'Crystal', 'Sunny', 'Spring']),
+            ('login', 'in', ['Cathy', 'Susan', 'Crystal', 'Sunny', 'Spring']),
             ('active', '=', True),
         ])
+        if not users:
+            users = self.env['res.users'].search([
+                ('name', 'in', ['Cathy', 'Susan', 'Crystal', 'Sunny', 'Spring']),
+                ('active', '=', True),
+            ])
         for record in self:
             record.purchase_user_ids = users
+
+    def _get_salesperson_domain(self):
+        if self.env.is_superuser():
+            return []
+        if self.env.user.has_group('base.group_system'):
+            return []
+        if self.env.user.has_group('custom_price_module.group_inquiry_manager'):
+            return []
+        if self.env.user.has_group('sales_team.group_sale_salesman'):
+            return [('salesperson_id', '=', self.env.uid)]
+        return []
+
+    @api.model
+    def _search(self, domain, offset=0, limit=None, order=None, **kwargs):
+        user_domain = self._get_salesperson_domain()
+        if user_domain:
+            domain = domain + user_domain
+        return super()._search(domain, offset, limit, order, **kwargs)
 
     def action_confirm_request(self):
         self.ensure_one()
@@ -166,11 +189,23 @@ class InquiryRequest(models.Model):
             }
             self.env['sale.order.line'].create(sale_order_line_vals)
         elif self.product_name:
-            default_product = self.env['product.product'].search([('type', '=', 'service')], limit=1)
+            product = self.env['product.product'].search([
+                ('name', '=', self.product_name),
+                ('type', '!=', 'service'),
+            ], limit=1)
+            if not product:
+                product = self.env['product.product'].create({
+                    'name': self.product_name,
+                    'type': 'consu',
+                    'purchase_ok': True,
+                })
+            if not product.product_tmpl_id.purchase_responsible_id:
+                product.product_tmpl_id.write({
+                    'purchase_responsible_id': self.lowest_quote_buyer.id,
+                })
             sale_order_line_vals = {
                 'order_id': sale_order.id,
-                'product_id': default_product.id if default_product else False,
-                'name': self.product_name,
+                'product_id': product.id,
                 'product_uom_qty': self.product_qty,
                 'price_unit': self.lowest_quote_price,
             }

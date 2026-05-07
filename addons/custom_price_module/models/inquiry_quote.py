@@ -71,10 +71,23 @@ class InquiryQuote(models.Model):
 
     def _compute_price_iframe(self):
         for record in self:
-            if record.request_id and record.request_id.product_name:
-                model = record.request_id.product_name
-                encoded_model = quote_plus(model)
-                html = f'''
+            if not record.request_id:
+                record.price_iframe = False
+                continue
+            
+            model = record.request_id.product_name
+            if not model:
+                html = '''
+<div style="padding: 20px; text-align: center; background: #fff3cd; color: #856404; border-radius: 5px;">
+    <h4><i class="fa fa-warning"></i> 提示：需求单中未填写产品型号</h4>
+    <p>请先在报价需求中填写产品型号，然后再进行报价。</p>
+</div>
+'''
+                record.price_iframe = html
+                continue
+            
+            encoded_model = quote_plus(model)
+            html = f'''
 <div class="price_tabs" style="border: 1px solid #ddd; border-radius: 5px;">
     <div style="display: flex; background: #f5f5f5; border-bottom: 1px solid #ddd; flex-wrap: wrap;">
         <button type="button" onclick="document.getElementById('tab_api').style.display='block';document.getElementById('tab_sht').style.display='none';document.getElementById('tab_yhxc').style.display='none';" style="flex: 1; min-width: 120px; padding: 12px; cursor: pointer; border: none; background: #007bff; color: white; font-weight: bold;">API报价</button>
@@ -94,9 +107,7 @@ class InquiryQuote(models.Model):
     </div>
 </div>
 '''
-                record.price_iframe = html
-            else:
-                record.price_iframe = False
+            record.price_iframe = html
 
     def _compute_supplier_code(self):
         for record in self:
@@ -178,3 +189,21 @@ class InquiryQuote(models.Model):
                 'target': 'new',
             }
         return {}
+
+    def _get_buyer_domain(self):
+        if self.env.is_superuser():
+            return []
+        if self.env.user.has_group('base.group_system'):
+            return []
+        if self.env.user.has_group('custom_price_module.group_inquiry_manager'):
+            return []
+        if self.env.user.has_group('purchase.group_purchase_user'):
+            return [('buyer_id', '=', self.env.uid)]
+        return []
+
+    @api.model
+    def _search(self, domain, offset=0, limit=None, order=None, **kwargs):
+        user_domain = self._get_buyer_domain()
+        if user_domain:
+            domain = domain + user_domain
+        return super()._search(domain, offset, limit, order, **kwargs)

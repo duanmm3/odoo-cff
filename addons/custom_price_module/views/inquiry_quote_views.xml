@@ -36,7 +36,7 @@
         <field name="name">采购报价表单</field>
         <field name="model">inquiry.quote</field>
         <field name="arch" type="xml">
-            <form string="采购报价">
+            <form string="采购报价" class="container" style="min-width: 800px;">
                 <header>
                     <button name="action_cancel_quote" type="object" string="取消报价"
                             invisible="state in ['cancelled']"/>
@@ -94,7 +94,6 @@
         <field name="name">我的报价</field>
         <field name="res_model">inquiry.quote</field>
         <field name="view_mode">list,form</field>
-        <field name="domain">[('buyer_id', '=', uid)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 暂无报价记录

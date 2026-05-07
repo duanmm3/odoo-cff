@@ -47,22 +47,34 @@ class PriceController(http.Controller):
     def price_query_submit(self, **kwargs):
         ic_model = kwargs.get('ic_model', '').strip()
         force_refresh = kwargs.get('refresh') == 'true'
+        _logger.info(f"price_query_submit called with ic_model={ic_model}, force_refresh={force_refresh}")
+        
         if not ic_model:
             redirect_path = '/zh_CN/price/query' if request.httprequest.path.startswith('/zh_CN') else '/price/query'
             return request.redirect(f'{redirect_path}?error=Please+enter+an+IC+model')
 
         try:
             price_model = request.env['price.query'].sudo()
+            _logger.info(f"Calling query_prices for {ic_model}...")
             result = price_model.query_prices(ic_model, force_refresh)
+            _logger.info(f"Query result: status={result.get('status')}, count={result.get('count')}, quotes_count={len(result.get('quotes', []))}")
+            
+            quotes = result.get('quotes', [])
+            if quotes:
+                _logger.info(f"First quote: supplier={quotes[0].get('supplier')}, price={quotes[0].get('price')}, rmb={quotes[0].get('rmb')}")
+            else:
+                _logger.warning(f"No quotes returned for {ic_model}. Message: {result.get('message', 'N/A')}")
+            
             return request.render('custom_price_module.price_result_page', {
                 'ic_model': ic_model,
                 'status': result.get('status', 'unknown'),
                 'message': result.get('message', ''),
                 'query_time': result.get('query_time', ''),
                 'count': result.get('count', 0),
-                'quotes': result.get('quotes', []),
+                'quotes': quotes,
             })
         except Exception as e:
+            _logger.error(f"Error querying prices for {ic_model}: {str(e)}", exc_info=True)
             redirect_path = '/zh_CN/price/query' if request.httprequest.path.startswith('/zh_CN') else '/price/query'
             return request.redirect(f'{redirect_path}?error=Error+querying+prices:+{quote_plus(str(e))}')
 

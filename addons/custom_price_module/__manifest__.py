@@ -1,5 +1,5 @@
 {
-    'name': 'Inquiry Analysis Module',
+    'name': ' Custom Price Module',
     'version': '2.0',
     'category': 'Sales',
     'summary': 'Inquiry analysis system for sales and purchase collaboration',
@@ -42,5 +42,6 @@ Sales Create Request → Purchase Quote → Price Analysis → Confirm → Sales
     'installable': True,
     'application': True,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
     'license': 'LGPL-3',
 }

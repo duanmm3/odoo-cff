@@ -4,13 +4,13 @@
 
     <menuitem id="menu_inquiry_request" name="报价需求" parent="menu_inquiry_root"
               action="action_inquiry_request" sequence="10"
-              groups="sales_team.group_sale_salesman,purchase.group_purchase_user"/>
+              groups="sales_team.group_sale_salesman"/>
 
-    <menuitem id="menu_inquiry_request_import" name="批量导入" parent="menu_inquiry_request"
+    <menuitem id="menu_inquiry_request_import" name="批量导入" parent="menu_inquiry_root"
               action="action_inquiry_request_import_wizard" sequence="15"
               groups="sales_team.group_sale_salesman,purchase.group_purchase_user"/>
 
     <menuitem id="menu_inquiry_quote" name="我的报价" parent="menu_inquiry_root"
               action="action_inquiry_quote" sequence="20"
-              groups="purchase.group_purchase_user"/>
+              groups="purchase.group_purchase_user,base.group_system"/>
 </odoo>
